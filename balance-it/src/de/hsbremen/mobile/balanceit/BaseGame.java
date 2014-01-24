@@ -21,6 +21,8 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.Input.Peripheral;
 
 public class BaseGame implements ApplicationListener {
@@ -56,7 +58,7 @@ public class BaseGame implements ApplicationListener {
 		
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		//cam.position.set(10f, 10f, 10f);
-		cam.position.set(0f, 0f, 10f);
+		cam.position.set(0f, 0f, 20f);
 		cam.lookAt(0, 0, 0);
 		cam.near = 0.1f;
 		cam.far = 300f;
@@ -104,26 +106,12 @@ public class BaseGame implements ApplicationListener {
 
 	@Override
 	public void render() {		
-		//camController.update();
-		refreshCameraPosition();
+		camController.update();
+		rotateModel(instance);
 		
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		
-		Gdx.app.log(
-				"balance-it",
-				"native orientation:" + Gdx.input.getNativeOrientation() +
-
-				", orientation: " + Gdx.input.getRotation() +
-
-				", accel: " + (int) Gdx.input.getAccelerometerX() + ", "
-						+ (int) Gdx.input.getAccelerometerY() + ", "
-						+ (int) Gdx.input.getAccelerometerZ() +
-
-						", apr: " + (int) Gdx.input.getAzimuth() + ", "
-						+ (int) Gdx.input.getPitch() + ", "
-						+ (int) Gdx.input.getRoll());
 		
 		modelBatch.begin(cam);
 		modelBatch.render(instance,environment);
@@ -148,14 +136,16 @@ public class BaseGame implements ApplicationListener {
 	public void resume() {
 	}
 	
+	
 	/**
-	 * Test method for sensors. Moves the camera according to the accelerometer.
+	 * Rotates the given model based on the accelerometer data.
 	 */
-	private void refreshCameraPosition() {
+	private void rotateModel(ModelInstance model) {
 		float roll = Gdx.input.getRoll();
 		float pitch = Gdx.input.getPitch();
-		cam.position.x = -pitch;
-		cam.position.y = roll;
-		cam.update();
+		
+		Matrix4 rotation = new Matrix4().setToRotation(Vector3.Z, pitch)
+				.mul(new Matrix4().setToRotation(Vector3.X, -roll));
+		model.transform.set(rotation);
 	}
 }
