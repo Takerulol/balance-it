@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.Input.Peripheral;
 
 public class BaseGame implements ApplicationListener {
 	private OrthographicCamera camera;
@@ -39,6 +40,12 @@ public class BaseGame implements ApplicationListener {
 	
 	@Override
 	public void create() {
+		
+		//check Sensor availability
+		if (!Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
+			//TODO: Throw error and terminate game
+		}
+		
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight,0.4f,0.4f,0.4f,1f));
 		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
@@ -48,7 +55,8 @@ public class BaseGame implements ApplicationListener {
 		float h = Gdx.graphics.getHeight();
 		
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		cam.position.set(10f, 10f, 10f);
+		//cam.position.set(10f, 10f, 10f);
+		cam.position.set(0f, 0f, 10f);
 		cam.lookAt(0, 0, 0);
 		cam.near = 0.1f;
 		cam.far = 300f;
@@ -96,11 +104,26 @@ public class BaseGame implements ApplicationListener {
 
 	@Override
 	public void render() {		
-		camController.update();
+		//camController.update();
+		refreshCameraPosition();
 		
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		
+		Gdx.app.log(
+				"balance-it",
+				"native orientation:" + Gdx.input.getNativeOrientation() +
+
+				", orientation: " + Gdx.input.getRotation() +
+
+				", accel: " + (int) Gdx.input.getAccelerometerX() + ", "
+						+ (int) Gdx.input.getAccelerometerY() + ", "
+						+ (int) Gdx.input.getAccelerometerZ() +
+
+						", apr: " + (int) Gdx.input.getAzimuth() + ", "
+						+ (int) Gdx.input.getPitch() + ", "
+						+ (int) Gdx.input.getRoll());
 		
 		modelBatch.begin(cam);
 		modelBatch.render(instance,environment);
@@ -123,5 +146,16 @@ public class BaseGame implements ApplicationListener {
 
 	@Override
 	public void resume() {
+	}
+	
+	/**
+	 * Test method for sensors. Moves the camera according to the accelerometer.
+	 */
+	private void refreshCameraPosition() {
+		float roll = Gdx.input.getRoll();
+		float pitch = Gdx.input.getPitch();
+		cam.position.x = -pitch;
+		cam.position.y = roll;
+		cam.update();
 	}
 }
