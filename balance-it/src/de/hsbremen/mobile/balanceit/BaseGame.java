@@ -23,6 +23,7 @@ import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.Input.Peripheral;
 
 public class BaseGame implements ApplicationListener {
@@ -42,6 +43,8 @@ public class BaseGame implements ApplicationListener {
 	
 	@Override
 	public void create() {
+		//initialize bullet physics
+		Bullet.init();
 		
 		//check Sensor availability
 		if (!Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
