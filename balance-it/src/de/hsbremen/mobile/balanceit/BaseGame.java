@@ -49,10 +49,7 @@ public class BaseGame implements ApplicationListener {
 	
 	@Override
 	public void create() {
-		//initialize bullet physics
-		Bullet.init();
-		physics = new Physics();
-		physics.setUp(GROUND_HEIGHT, SPHERE_HEIGHT);
+		
 		
 		//check Sensor availability
 		if (!Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
@@ -74,6 +71,11 @@ public class BaseGame implements ApplicationListener {
 		cam.near = 0.1f;
 		cam.far = 300f;
 		cam.update();
+		
+		//initialize bullet physics
+		Bullet.init();
+		physics = new Physics();
+		physics.setUp(GROUND_HEIGHT, SPHERE_HEIGHT);
 		
 		camController = new CameraInputController(cam);
 		Gdx.input.setInputProcessor(camController);
@@ -117,6 +119,7 @@ public class BaseGame implements ApplicationListener {
 //		texture.dispose();
 		model.dispose();
 		modelBatch.dispose();
+		physics.dispose();
 	}
 
 	@Override
@@ -125,6 +128,7 @@ public class BaseGame implements ApplicationListener {
 		rotateModel(instance);
 		
 		//update physics
+		physics.setGroundTransform(instance.transform);
 		physics.update(Gdx.graphics.getDeltaTime());
 		instance2.transform = physics.getSphereTransform();
 		

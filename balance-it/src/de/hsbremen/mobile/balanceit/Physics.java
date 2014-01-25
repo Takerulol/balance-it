@@ -21,6 +21,7 @@ public class Physics {
 	btCollisionShape fallShape; 
 	btDiscreteDynamicsWorld dynamicsWorld;
 	btRigidBody sphere;
+	btRigidBody ground;
 	
 	public static final int SPHERE_MASS = 1;
 	
@@ -67,7 +68,7 @@ public class Physics {
 		groundMotionState.setWorldTransform(transform);
 		btRigidBodyConstructionInfo groundInfo = new btRigidBodyConstructionInfo
 				(0f, groundMotionState, groundShape, Vector3.Zero);
-		btRigidBody ground = new btRigidBody(groundInfo);
+		ground = new btRigidBody(groundInfo);
 		dynamicsWorld.addRigidBody(ground);
 	}
 	
@@ -77,6 +78,10 @@ public class Physics {
 	
 	public Matrix4 getSphereTransform() {
 		return sphere.getWorldTransform();
+	}
+	
+	public void setGroundTransform(Matrix4 transform) {
+		ground.setWorldTransform(transform);
 	}
 	
 	public void dispose() {
