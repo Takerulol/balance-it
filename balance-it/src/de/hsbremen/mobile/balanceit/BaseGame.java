@@ -171,9 +171,9 @@ public class BaseGame implements ApplicationListener {
 		float roll = Gdx.input.getRoll();
 		float pitch = Gdx.input.getPitch();
 		
-		/*Matrix4 rotation = new Matrix4().setToRotation(Vector3.Z, pitch)
+		Matrix4 rotation = new Matrix4().setToRotation(Vector3.Z, pitch)
 				.mul(new Matrix4().setToRotation(Vector3.X, -roll));
-		model.transform.set(rotation); */
+		//model.transform.set(rotation); 
 		model.transform.rotate(Vector3.X, 0.1f);
 	}
 	
