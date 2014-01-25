@@ -24,15 +24,26 @@ public class Physics {
 	btRigidBody sphere;
 	btRigidBody ground;
 	
+	
 	public static final int SPHERE_MASS = 1;
+	
+	//store objects for disposal
+	btBroadphaseInterface broadphase;
+	btDefaultCollisionConfiguration collisionConfiguration;
+	btCollisionDispatcher dispatcher;
+	btSequentialImpulseConstraintSolver solver; 
+	btRigidBodyConstructionInfo sphereInfo;
+	btDefaultMotionState sphereMotionState;
+	btDefaultMotionState groundMotionState;
+	btRigidBodyConstructionInfo groundInfo;
 	
 	
 	public void setUp(float groundHeight, float groundWidth, float sphereHeight) {
 		//collision detection
-		btBroadphaseInterface broadphase = new btDbvtBroadphase();
-		btDefaultCollisionConfiguration collisionConfiguration = new btDefaultCollisionConfiguration();
-		btCollisionDispatcher dispatcher = new btCollisionDispatcher(collisionConfiguration);
-		btSequentialImpulseConstraintSolver solver = new btSequentialImpulseConstraintSolver();
+		broadphase = new btDbvtBroadphase();
+		collisionConfiguration = new btDefaultCollisionConfiguration();
+		dispatcher = new btCollisionDispatcher(collisionConfiguration);
+		solver = new btSequentialImpulseConstraintSolver();
 		
 		//init dynamic world
 		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, 
@@ -53,23 +64,23 @@ public class Physics {
 	public void initSphere(Matrix4 transform) {
 		//should multiple spheres be build, it is sufficient to pass the same sphere construct info
 		//to all rigid bodies
-		btDefaultMotionState sphereMotionState = new btDefaultMotionState();
+		sphereMotionState = new btDefaultMotionState();
 		sphereMotionState.setWorldTransform(transform);
 		
 		//Trägheit
 		Vector3 fallInertia = Vector3.Zero;
 		fallShape.calculateLocalInertia(SPHERE_MASS, fallInertia);
 		
-		btRigidBodyConstructionInfo sphereInfo = new btRigidBodyConstructionInfo
+		sphereInfo = new btRigidBodyConstructionInfo
 				(SPHERE_MASS, sphereMotionState, fallShape, fallInertia);
 		sphere = new btRigidBody(sphereInfo);
 		dynamicsWorld.addRigidBody(sphere);
 	}
 	
 	public void initGround(Matrix4 transform) {
-		btDefaultMotionState groundMotionState = new btDefaultMotionState();
+		groundMotionState = new btDefaultMotionState();
 		groundMotionState.setWorldTransform(transform);
-		btRigidBodyConstructionInfo groundInfo = new btRigidBodyConstructionInfo
+		groundInfo = new btRigidBodyConstructionInfo
 				(0f, groundMotionState, groundShape, Vector3.Zero);
 		ground = new btRigidBody(groundInfo);
 		dynamicsWorld.addRigidBody(ground);
@@ -94,7 +105,47 @@ public class Physics {
 	}
 	
 	public void dispose() {
-		//TODO: Dispose everything, safe in lists
+		if (groundShape != null)
+			groundShape.dispose();
+		
+		if (fallShape != null)
+			fallShape.dispose();
+		
+		if (dynamicsWorld != null)
+			dynamicsWorld.dispose();
+		
+		if (sphere != null)
+			sphere.dispose();
+		
+		if (sphere != null)
+			sphere.dispose();
+		
+		if (ground != null)
+			ground.dispose();
+		
+		if (broadphase != null)
+			broadphase.dispose();
+		
+		if (collisionConfiguration != null)
+			collisionConfiguration.dispose();
+		
+		if (dispatcher != null)
+			dispatcher.dispose();
+		
+		if (solver != null)
+			solver.dispose();
+		
+		if (sphereInfo != null)
+			sphereInfo.dispose();
+		
+		if (sphereMotionState != null)
+			sphereMotionState.dispose();
+		
+		if (groundMotionState != null)
+			groundMotionState.dispose();
+
+		if (groundInfo != null)
+			groundInfo.dispose();
 	}
 	
 }
