@@ -27,6 +27,10 @@ import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.Input.Peripheral;
 
 public class BaseGame implements ApplicationListener {
+	private static final float SPHERE_HEIGHT = 2.0f;
+	private static final float GROUND_HEIGHT = 0.2f;
+	private static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
+	
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Texture texture;
@@ -41,10 +45,14 @@ public class BaseGame implements ApplicationListener {
 	private Environment environment;
 	private CameraInputController camController;
 	
+	Physics physics;
+	
 	@Override
 	public void create() {
 		//initialize bullet physics
 		Bullet.init();
+		physics = new Physics();
+		physics.setUp(GROUND_HEIGHT, SPHERE_HEIGHT);
 		
 		//check Sensor availability
 		if (!Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
@@ -71,7 +79,7 @@ public class BaseGame implements ApplicationListener {
 		Gdx.input.setInputProcessor(camController);
 		
 		ModelBuilder modelBuilder = new ModelBuilder();
-		model = modelBuilder.createCylinder(20f, 0.2f, 20f, 32, 
+		model = modelBuilder.createCylinder(20f, GROUND_HEIGHT, 20f, 32, 
 				new Material(ColorAttribute.createDiffuse(Color.YELLOW)), 
 				Usage.Position | Usage.Normal);
 //		model = modelBuilder.createBox(5f, 5f, 5f, 
@@ -79,11 +87,15 @@ public class BaseGame implements ApplicationListener {
 //				Usage.Position | Usage.Normal);
 		instance = new ModelInstance(model);
 		
-		ball = modelBuilder.createSphere(3f, 3f, 3f, 32, 32, 
+		physics.initGround(instance.transform);
+		
+		ball = modelBuilder.createSphere(SPHERE_HEIGHT, SPHERE_HEIGHT, SPHERE_HEIGHT, 32, 32, 
 				new Material(ColorAttribute.createDiffuse(Color.RED)),
 				Usage.Position | Usage.Normal);
 		
-		instance2 = new ModelInstance(ball);
+		instance2 = new ModelInstance(ball, SPHERE_INITIAL_POSITION);
+		
+		physics.initSphere(instance2.transform);
 		
 //		camera = new OrthographicCamera(1, h/w);
 //		batch = new SpriteBatch();
@@ -108,9 +120,13 @@ public class BaseGame implements ApplicationListener {
 	}
 
 	@Override
-	public void render() {		
+	public void render() {
 		camController.update();
 		rotateModel(instance);
+		
+		//update physics
+		physics.update(Gdx.graphics.getDeltaTime());
+		instance2.transform = physics.getSphereTransform();
 		
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClearColor(0, 0, 0, 1);
