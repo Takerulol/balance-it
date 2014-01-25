@@ -83,6 +83,12 @@ public class Physics {
 		return sphere.getWorldTransform();
 	}
 	
+	public void resetSphere(Matrix4 transform) {
+		dynamicsWorld.removeRigidBody(sphere);
+		sphere.dispose();
+		initSphere(transform);
+	}
+	
 	public void setGroundTransform(Matrix4 transform) {
 		ground.setWorldTransform(transform);
 	}

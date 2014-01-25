@@ -31,6 +31,7 @@ public class BaseGame implements ApplicationListener {
 	private static final float GROUND_HEIGHT = 0.2f;
 	private static final float GROUND_WIDTH = 20f;
 	private static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
+	private static final float MIN_BALL_Y_POSITION = -GROUND_WIDTH * 1.5f; //balls will get reseted when falling below this value
 	
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
@@ -132,6 +133,8 @@ public class BaseGame implements ApplicationListener {
 		physics.setGroundTransform(instance.transform);
 		physics.update(Gdx.graphics.getDeltaTime());
 		instance2.transform = physics.getSphereTransform();
+		checkSpherePosition(instance2);
+		
 		
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -172,5 +175,16 @@ public class BaseGame implements ApplicationListener {
 				.mul(new Matrix4().setToRotation(Vector3.X, -roll));
 		model.transform.set(rotation); */
 		model.transform.rotate(Vector3.X, 0.1f);
+	}
+	
+	private void checkSpherePosition(ModelInstance sphere) {
+		Vector3 position = Vector3.Zero;
+		sphere.transform.getTranslation(position);
+		if (position.y < MIN_BALL_Y_POSITION) {
+			//reset ball
+			sphere.transform.setTranslation(SPHERE_INITIAL_POSITION);
+			sphere.calculateTransforms();
+			physics.resetSphere(sphere.transform);
+		}
 	}
 }
