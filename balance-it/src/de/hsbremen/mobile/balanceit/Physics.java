@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBroadphaseInterface;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
 import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
@@ -26,7 +27,7 @@ public class Physics {
 	public static final int SPHERE_MASS = 1;
 	
 	
-	public void setUp(float groundHeight, float sphereHeight) {
+	public void setUp(float groundHeight, float groundWidth, float sphereHeight) {
 		//collision detection
 		btBroadphaseInterface broadphase = new btDbvtBroadphase();
 		btDefaultCollisionConfiguration collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -38,8 +39,10 @@ public class Physics {
 				solver, collisionConfiguration);
 		dynamicsWorld.setGravity(new Vector3(0, -10, 0));
 		
-		//set up shapes TODO: Maybe in a separate method and with parameters
-		groundShape = new btStaticPlaneShape(new Vector3(0,1,0), groundHeight / 2f);
+		//groundShape = new btStaticPlaneShape(new Vector3(0,1,0), groundHeight / 2f);
+		Vector3 groundHalfExtends = new 
+				Vector3(groundWidth /2f, groundHeight / 2f, groundWidth /2f); //half x, y, z extend
+		groundShape = new btCylinderShape(groundHalfExtends);
 		fallShape = new btSphereShape(sphereHeight / 2f);
 	}
 	

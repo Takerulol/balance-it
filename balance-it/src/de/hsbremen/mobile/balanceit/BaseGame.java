@@ -29,6 +29,7 @@ import com.badlogic.gdx.Input.Peripheral;
 public class BaseGame implements ApplicationListener {
 	private static final float SPHERE_HEIGHT = 2.0f;
 	private static final float GROUND_HEIGHT = 0.2f;
+	private static final float GROUND_WIDTH = 20f;
 	private static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
 	
 	private OrthographicCamera camera;
@@ -75,13 +76,13 @@ public class BaseGame implements ApplicationListener {
 		//initialize bullet physics
 		Bullet.init();
 		physics = new Physics();
-		physics.setUp(GROUND_HEIGHT, SPHERE_HEIGHT);
+		physics.setUp(GROUND_HEIGHT, GROUND_WIDTH, SPHERE_HEIGHT);
 		
 		camController = new CameraInputController(cam);
 		Gdx.input.setInputProcessor(camController);
 		
 		ModelBuilder modelBuilder = new ModelBuilder();
-		model = modelBuilder.createCylinder(20f, GROUND_HEIGHT, 20f, 32, 
+		model = modelBuilder.createCylinder(20f, GROUND_HEIGHT, GROUND_WIDTH, 32, 
 				new Material(ColorAttribute.createDiffuse(Color.YELLOW)), 
 				Usage.Position | Usage.Normal);
 //		model = modelBuilder.createBox(5f, 5f, 5f, 
@@ -167,8 +168,9 @@ public class BaseGame implements ApplicationListener {
 		float roll = Gdx.input.getRoll();
 		float pitch = Gdx.input.getPitch();
 		
-		Matrix4 rotation = new Matrix4().setToRotation(Vector3.Z, pitch)
+		/*Matrix4 rotation = new Matrix4().setToRotation(Vector3.Z, pitch)
 				.mul(new Matrix4().setToRotation(Vector3.X, -roll));
-		model.transform.set(rotation);
+		model.transform.set(rotation); */
+		model.transform.rotate(Vector3.X, 0.1f);
 	}
 }
