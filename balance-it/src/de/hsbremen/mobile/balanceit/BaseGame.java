@@ -27,8 +27,8 @@ import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.Input.Peripheral;
 
 public class BaseGame implements ApplicationListener {
-	private static final float SPHERE_HEIGHT = 2.0f;
-	private static final float GROUND_HEIGHT = 0.2f;
+	private static final float SPHERE_HEIGHT = 1.5f;
+	private static final float GROUND_HEIGHT = 1.0f;
 	private static final float GROUND_WIDTH = 20f;
 	private static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
 	private static final float MIN_BALL_Y_POSITION = -GROUND_WIDTH * 1.5f; //balls will get reseted when falling below this value
@@ -173,8 +173,8 @@ public class BaseGame implements ApplicationListener {
 		
 		Matrix4 rotation = new Matrix4().setToRotation(Vector3.Z, pitch)
 				.mul(new Matrix4().setToRotation(Vector3.X, -roll));
-		//model.transform.set(rotation); 
-		model.transform.rotate(Vector3.X, 0.1f);
+		model.transform.set(rotation); 
+		//model.transform.rotate(Vector3.X, 0.1f);
 	}
 	
 	private void checkSpherePosition(ModelInstance sphere) {

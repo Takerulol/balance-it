@@ -25,7 +25,7 @@ public class Physics {
 	btRigidBody ground;
 	
 	
-	public static final int SPHERE_MASS = 1;
+	public static final int SPHERE_MASS = 2;
 	
 	//store objects for disposal
 	btBroadphaseInterface broadphase;
@@ -74,6 +74,7 @@ public class Physics {
 		sphereInfo = new btRigidBodyConstructionInfo
 				(SPHERE_MASS, sphereMotionState, fallShape, fallInertia);
 		sphere = new btRigidBody(sphereInfo);
+		sphere.setDamping(0.2f, 0.2f);
 		dynamicsWorld.addRigidBody(sphere);
 	}
 	
