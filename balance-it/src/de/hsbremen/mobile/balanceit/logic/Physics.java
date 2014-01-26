@@ -2,6 +2,7 @@ package de.hsbremen.mobile.balanceit.logic;
 
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.Collision;
 import com.badlogic.gdx.physics.bullet.collision.btBroadphaseInterface;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
@@ -26,6 +27,7 @@ public class Physics {
 	
 	
 	public static final int SPHERE_MASS = 2;
+	public static final float SPHERE_DAMPING = 0.4f;
 	
 	//store objects for disposal
 	btBroadphaseInterface broadphase;
@@ -74,7 +76,8 @@ public class Physics {
 		sphereInfo = new btRigidBodyConstructionInfo
 				(SPHERE_MASS, sphereMotionState, fallShape, fallInertia);
 		sphere = new btRigidBody(sphereInfo);
-		sphere.setDamping(0.2f, 0.2f);
+		sphere.setDamping(SPHERE_DAMPING, SPHERE_DAMPING);
+		sphere.setActivationState(Collision.DISABLE_DEACTIVATION);
 		dynamicsWorld.addRigidBody(sphere);
 	}
 	
