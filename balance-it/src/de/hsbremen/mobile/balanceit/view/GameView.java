@@ -14,10 +14,12 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
+import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.Physics;
 
 public class GameView extends View {
@@ -41,7 +43,8 @@ public class GameView extends View {
 	private ModelInstance instance2;
 	private ModelBatch modelBatch;
 	private Environment environment;
-	private CameraInputController camController;
+	private CameraInputController camController; //TODO: delete
+	private ForceManager forceManager;
 	
 	Physics physics;
 	
@@ -68,7 +71,7 @@ public class GameView extends View {
 		
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		//cam.position.set(10f, 10f, 10f);
-		cam.position.set(0f, 0f, 20f);
+		cam.position.set(0.0f, 20f, 0.01f);
 		cam.lookAt(0, 0, 0);
 		cam.near = 0.1f;
 		cam.far = 300f;
@@ -80,7 +83,11 @@ public class GameView extends View {
 		physics.setUp(GROUND_HEIGHT, GROUND_WIDTH, SPHERE_HEIGHT);
 		
 		camController = new CameraInputController(cam);
-		Gdx.input.setInputProcessor(camController);
+		//Gdx.input.setInputProcessor(camController);
+		forceManager = new ForceManager();
+		GestureDetector gestureDetector = new GestureDetector(forceManager);
+		Gdx.input.setInputProcessor(gestureDetector);
+		
 		
 		ModelBuilder modelBuilder = new ModelBuilder();
 		model = modelBuilder.createCylinder(20f, GROUND_HEIGHT, GROUND_WIDTH, 32, 
@@ -164,15 +171,22 @@ public class GameView extends View {
 			physics.resetSphere(sphere.transform);
 		}
 	}
+	
+	private void applyForce() {
+		Vector3 force = forceManager.getForceVector();
+		Gdx.app.log("balance-it", force.toString());
+	}
 
 	@Override
 	public void renderObjects() {
 		
 		camController.update();
+		Gdx.app.log("balance-it", cam.position.toString());
 		rotateModel(instance);
 		
 		//update physics
 		physics.setGroundTransform(instance.transform);
+		applyForce();
 		physics.update(Gdx.graphics.getDeltaTime());
 		instance2.transform = physics.getSphereTransform();
 		checkSpherePosition(instance2);
