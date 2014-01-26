@@ -108,6 +108,13 @@ public class Physics {
 		ground.setWorldTransform(transform);
 	}
 	
+	/**
+	 * Applies the given force to the center of the sphere.
+	 */
+	public void applyForceToSphere(Vector3 force) {
+		sphere.applyCentralForce(force);
+	}
+	
 	public void dispose() {
 		if (groundShape != null)
 			groundShape.dispose();

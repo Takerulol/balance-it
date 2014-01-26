@@ -11,10 +11,15 @@ public class ForceManager extends GestureAdapter {
 	 */
 	private Vector3 forceVector = Vector3.Zero;
 	
+	/**
+	 * Magnitude of the force vector. 
+	 */
+	public static final float FORCE_MAGNITUTE = 8.0f;
+	
 	
 	@Override
 	public boolean fling(float velocityX, float velocityY, int button) {
-		forceVector = new Vector3(velocityX, 0, velocityY).nor();
+		forceVector = new Vector3(velocityX, 0, velocityY).nor().scl(FORCE_MAGNITUTE);
 		return false;
 	}
 

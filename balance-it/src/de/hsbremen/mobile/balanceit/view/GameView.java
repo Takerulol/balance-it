@@ -174,7 +174,7 @@ public class GameView extends View {
 	
 	private void applyForce() {
 		Vector3 force = forceManager.getForceVector();
-		Gdx.app.log("balance-it", force.toString());
+		physics.applyForceToSphere(force);
 	}
 
 	@Override
