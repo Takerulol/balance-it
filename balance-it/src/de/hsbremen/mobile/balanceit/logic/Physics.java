@@ -1,4 +1,4 @@
-package de.hsbremen.mobile.balanceit;
+package de.hsbremen.mobile.balanceit.logic;
 
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
