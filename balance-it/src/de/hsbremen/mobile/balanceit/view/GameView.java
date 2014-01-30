@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
+import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.Physics;
 
@@ -200,6 +201,11 @@ public class GameView extends View {
 //		batch.begin();
 //		sprite.draw(batch);
 //		batch.end();
+	}
+
+	@Override
+	public void setGameService(GameService gameService) {
+		//TODO: implement me
 	}
 
 }

@@ -30,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.Input.Peripheral;
 
+import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.view.GameView;
 import de.hsbremen.mobile.balanceit.view.MenuView;
 import de.hsbremen.mobile.balanceit.view.View;
@@ -41,6 +42,16 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	
 	View currentView;
 	
+	private final GameService gameService;
+	
+	public BaseGame() {
+		this.gameService = null;
+	}
+	
+	public BaseGame(GameService gameService) {
+		this.gameService = gameService;
+	}
+
 	@Override
 	public void create() {
 		
@@ -51,10 +62,13 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		}
 		
 		this.menuView = new MenuView(this);
-		this.gameView = new GameView(this);
+        this.gameView = new GameView(this);
+        
+        if(this.gameService != null) {
+        	this.menuView.setGameService(this.gameService);
+        }
 		
 		changeView(this.menuView);
-		
 	}
 
 	@Override
@@ -83,16 +97,15 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	public void startGame() {
 		changeView(this.gameView);
 	}
-
+	
 	@Override
 	public void switchToMenu() {
-		// TODO Auto-generated method stub
-		
+		//TODO: implement me	
 	}
-	
+
 	private void changeView(View view) {
-		if(this.currentView != null) 
-			this.currentView.dispose();
+		if(this.currentView != null )
+				this.currentView.dispose();
 		this.currentView = view;
 		this.currentView.create();
 	}
