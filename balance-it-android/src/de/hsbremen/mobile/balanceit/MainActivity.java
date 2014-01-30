@@ -23,27 +23,29 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.useGL20 = true;
         
-        initialize(new BaseGame(this), cfg);
+        initialize(new BaseGame(), cfg);
         
-        this.gameHelper.setup(this);
+//        initialize(new BaseGame(this), cfg);
+        
+//        this.gameHelper.setup(this);
     }
 	
 	@Override
 	protected void onStart() {
 		super.onStart();
-		this.gameHelper.onStart(this);
+//		this.gameHelper.onStart(this);
 	}
 	
 	@Override
 	protected void onStop() {
 		super.onStop();
-		this.gameHelper.onStop();
+//		this.gameHelper.onStop();
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		this.gameHelper.onActivityResult(requestCode, resultCode, data);
+//		this.gameHelper.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@Override
