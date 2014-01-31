@@ -21,7 +21,7 @@ public abstract class ByteConverter {
 	}
 	
 	public static Vector3 toVector3(byte[] values, int offset) {
-		ByteBuffer buffer = ByteBuffer.wrap(values, offset, values.length - 1);
+		ByteBuffer buffer = ByteBuffer.wrap(values, offset, values.length - offset);
 		float x = buffer.getFloat(0);
 		float y = buffer.getFloat(4);
 		float z = buffer.getFloat(8);
@@ -40,15 +40,15 @@ public abstract class ByteConverter {
 	}
 	
 	public static Matrix4 toMatrix4(byte[] values, int offset) {
-		ByteBuffer buffer = ByteBuffer.wrap(values, offset, values.length - 1);
+		ByteBuffer buffer = ByteBuffer.wrap(values, offset, values.length - offset);
 		float[] array = new float[buffer.limit() / 4];
 		
 		int i = 0;
 		int index = 0;
 		while (index < buffer.limit()) {
-			index = i * 4;
 			array[i] = buffer.getFloat(index);
 			i++;
+			index = i * 4;
 		}
 		
 		return new Matrix4(array);
