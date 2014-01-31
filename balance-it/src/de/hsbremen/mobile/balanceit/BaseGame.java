@@ -30,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.Input.Peripheral;
 
+import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
 import de.hsbremen.mobile.balanceit.view.GameView;
@@ -56,9 +57,10 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		
 		Bullet.init();
 		PlayerRole role = PlayerRole.SinglePlayer;
+		NetworkManager networkManager = null;
 		
 		this.menuView = new MenuView(this);
-		this.gameView = new GameViewFactory().createGameView(this, role, true);
+		this.gameView = new GameViewFactory().createGameView(this, role, true, networkManager);
 		
 		changeView(this.menuView);
 		

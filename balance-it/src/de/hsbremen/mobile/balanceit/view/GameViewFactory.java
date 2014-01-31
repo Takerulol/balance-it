@@ -2,6 +2,10 @@ package de.hsbremen.mobile.balanceit.view;
 
 import com.badlogic.gdx.input.GestureDetector;
 
+import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
+import de.hsbremen.mobile.balanceit.gameservices.RemoteForceManager;
+import de.hsbremen.mobile.balanceit.gameservices.RemotePhysics;
+import de.hsbremen.mobile.balanceit.gameservices.SendPhysicsProxy;
 import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
 import de.hsbremen.mobile.balanceit.logic.ForceDifficultyManager;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
@@ -19,35 +23,35 @@ public class GameViewFactory {
 	 * Creates a GameView based on the parameters.
 	 * @param listener The GameView.Listener that should be used.
 	 * @param role The PlayerRole which the GameView will be used for.
-	 * @param increaseFoce Determines whether or not the GameView should increase the force after some time (does not apply to role Balancer).
+	 * @param increaseFoce Determines whether or not the GameView should increase the force after some time (does not apply to role ForceApplier).
 	 * @return The created GameView.
 	 */
-	public GameView createGameView(GameView.Listener listener, PlayerRole role, boolean increaseForce) {
+	public GameView createGameView(GameView.Listener listener, PlayerRole role, boolean increaseForce, 
+		NetworkManager networkManager) {
 		GameView view = null;
 		GestureForceManager manager = null;
 		GestureDetector gestureDetector = null;
 		
 		//create GameView based on player role
 		switch (role) {
-			case Balancer: //TODO: Networked ForceManager
-				manager = new GestureForceManager(); 
-				gestureDetector = new GestureDetector(manager);
+			case Balancer: 
+				ForceManager remoteManager = createForceManager(role, increaseForce, networkManager);
 				Physics balancerPhysics = createBulletPhysics();
-				view = new GameView(listener, manager, gestureDetector, balancerPhysics);
+				balancerPhysics = new SendPhysicsProxy(balancerPhysics, networkManager);
+				view = new GameView(listener, remoteManager, null, balancerPhysics); //TODO: CameraInput
 				break;
-				
 				
 			case ForceApplier:
 				manager = new GestureForceManager(); 
 				gestureDetector = new GestureDetector(manager);
-				Physics applierPhysics = createBulletPhysics(); // TODO: Networked physics
+				Physics applierPhysics = new RemotePhysics(networkManager);
 				view = new GameView(listener, manager, gestureDetector, applierPhysics);
 				break;
 				
 			case SinglePlayer:
-				ForceManager randomManager = createForceManager(role, increaseForce);
+				ForceManager randomManager = createForceManager(role, increaseForce, networkManager);
 				Physics singlePlayerPhysics = createBulletPhysics();
-				view = new GameView(listener, randomManager, null, singlePlayerPhysics);
+				view = new GameView(listener, randomManager, null, singlePlayerPhysics); //TODO: CameraInput
 				break;
 				
 		}
@@ -66,13 +70,13 @@ public class GameViewFactory {
 	 * @param increase Adds a ForceDifficultyManager proxy to the ForceManager if true.
 	 * @return
 	 */
-	private ForceManager createForceManager(PlayerRole role, boolean increase) {
+	private ForceManager createForceManager(PlayerRole role, boolean increase, NetworkManager networkManager) {
 		ForceManager manager = null;
 		
 		switch (role) {
 		
 		case Balancer:
-			manager = new GestureForceManager(); //TODO: Networked
+			manager = new RemoteForceManager(networkManager);
 			break;
 		
 		case ForceApplier:
