@@ -15,9 +15,9 @@ public enum Header
 	
 	/**
 	 * Payload:
-	 * ...
+	 * Matrix4 sphere transform.
 	 */
-	PHYSICS((byte)1);
+	SPHERE_MATRIX((byte)1);
 	
 	private byte value;
 	

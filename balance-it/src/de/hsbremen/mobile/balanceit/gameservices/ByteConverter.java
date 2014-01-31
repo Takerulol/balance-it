@@ -1,6 +1,8 @@
 package de.hsbremen.mobile.balanceit.gameservices;
 
 import java.nio.ByteBuffer;
+
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -16,7 +18,6 @@ public abstract class ByteConverter {
 		buffer.putFloat(vector3.z);
 		
 		return buffer.array();
-		
 	}
 	
 	public static Vector3 toVector3(byte[] values, int offset) {
@@ -25,6 +26,32 @@ public abstract class ByteConverter {
 		float y = buffer.getFloat(4);
 		float z = buffer.getFloat(8);
 		return new Vector3(x, y, z);
+	}
+	
+	public static byte[] toByte(Matrix4 matrix4) {
+		float[] values = matrix4.val;
+		ByteBuffer buffer = ByteBuffer.allocate(values.length * 4);
+		
+		for (int i = 0; i < values.length; i++) {
+			buffer.putFloat(i * 4, values[i]);
+		}
+		
+		return buffer.array();
+	}
+	
+	public static Matrix4 toMatrix4(byte[] values, int offset) {
+		ByteBuffer buffer = ByteBuffer.wrap(values, offset, values.length - 1);
+		float[] array = new float[buffer.limit() / 4];
+		
+		int i = 0;
+		int index = 0;
+		while (index < buffer.limit()) {
+			index = i * 4;
+			array[i] = buffer.getFloat(index);
+			i++;
+		}
+		
+		return new Matrix4(array);
 	}
 	
 }
