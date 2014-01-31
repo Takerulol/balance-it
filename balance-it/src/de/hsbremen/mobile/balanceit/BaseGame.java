@@ -30,7 +30,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.Input.Peripheral;
 
+import de.hsbremen.mobile.balanceit.logic.ForceManager;
+import de.hsbremen.mobile.balanceit.logic.PlayerRole;
 import de.hsbremen.mobile.balanceit.view.GameView;
+import de.hsbremen.mobile.balanceit.view.GameViewFactory;
 import de.hsbremen.mobile.balanceit.view.MenuView;
 import de.hsbremen.mobile.balanceit.view.View;
 
@@ -50,8 +53,10 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 			//TODO: Throw error and terminate game
 		}
 		
+		PlayerRole role = PlayerRole.Balancer;
+		
 		this.menuView = new MenuView(this);
-		this.gameView = new GameView(this);
+		this.gameView = new GameViewFactory().createGameView(this, role);
 		
 		changeView(this.menuView);
 		

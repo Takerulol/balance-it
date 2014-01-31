@@ -1,6 +1,7 @@
 package de.hsbremen.mobile.balanceit.view;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
+import de.hsbremen.mobile.balanceit.logic.LocalForceManager;
 import de.hsbremen.mobile.balanceit.logic.Physics;
 
 public class GameView extends View {
@@ -45,6 +47,7 @@ public class GameView extends View {
 	private Environment environment;
 	private CameraInputController camController; //TODO: delete
 	private ForceManager forceManager;
+	private InputProcessor inputProcessor; 
 	
 	Physics physics;
 	
@@ -54,8 +57,10 @@ public class GameView extends View {
 	 */
 	private GameView() {}
 	
-	public GameView(Listener listener) {
+	public GameView(Listener listener, ForceManager forceManager, InputProcessor input) {
 		this.listener = listener;
+		this.forceManager = forceManager;
+		this.inputProcessor = input;
 	}
 	
 	
@@ -84,9 +89,8 @@ public class GameView extends View {
 		
 		camController = new CameraInputController(cam);
 		//Gdx.input.setInputProcessor(camController);
-		forceManager = new ForceManager();
-		GestureDetector gestureDetector = new GestureDetector(forceManager);
-		Gdx.input.setInputProcessor(gestureDetector);
+		
+		Gdx.input.setInputProcessor(inputProcessor);
 		
 		
 		ModelBuilder modelBuilder = new ModelBuilder();
