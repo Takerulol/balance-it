@@ -183,7 +183,7 @@ public class GameView extends View {
 	public void renderObjects() {
 		
 		camController.update();
-		Gdx.app.log("balance-it", cam.position.toString());
+		//Gdx.app.log("balance-it", cam.position.toString());
 		rotateModel(instance);
 		
 		//update physics

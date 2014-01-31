@@ -55,7 +55,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		
 		
 		Bullet.init();
-		PlayerRole role = PlayerRole.Balancer;
+		PlayerRole role = PlayerRole.SinglePlayer;
 		
 		this.menuView = new MenuView(this);
 		this.gameView = new GameViewFactory().createGameView(this, role);

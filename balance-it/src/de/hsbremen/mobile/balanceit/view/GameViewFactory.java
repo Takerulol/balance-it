@@ -1,13 +1,13 @@
 package de.hsbremen.mobile.balanceit.view;
 
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.physics.bullet.Bullet;
 
 import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.GestureForceManager;
 import de.hsbremen.mobile.balanceit.logic.Physics;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
+import de.hsbremen.mobile.balanceit.logic.RandomForceManager;
 
 /**
  * This class creates a GameView class based on given options.
@@ -35,6 +35,13 @@ public class GameViewFactory {
 				Physics applierPhysics = createBulletPhysics(); // TODO: Networked physics
 				view = new GameView(listener, manager, gestureDetector, applierPhysics);
 				break;
+				
+			case SinglePlayer:
+				ForceManager randomManager = new RandomForceManager();
+				Physics singlePlayerPhysics = createBulletPhysics();
+				view = new GameView(listener, randomManager, null, singlePlayerPhysics);
+				break;
+				
 		}
 		
 		
