@@ -21,7 +21,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
-import de.hsbremen.mobile.balanceit.logic.LocalForceManager;
+import de.hsbremen.mobile.balanceit.logic.GestureForceManager;
+import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
 import de.hsbremen.mobile.balanceit.logic.Physics;
 
 public class GameView extends View {
@@ -32,9 +33,9 @@ public class GameView extends View {
 	
 	private Listener listener;
 
-	private static final float SPHERE_HEIGHT = 1.5f;
-	private static final float GROUND_HEIGHT = 1.0f;
-	private static final float GROUND_WIDTH = 20f;
+	public static final float SPHERE_HEIGHT = 1.5f;
+	public static final float GROUND_HEIGHT = 1.0f;
+	public static final float GROUND_WIDTH = 20f;
 	private static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
 	private static final float MIN_BALL_Y_POSITION = -GROUND_WIDTH * 1.5f; //balls will get reseted when falling below this value
 	
@@ -57,10 +58,12 @@ public class GameView extends View {
 	 */
 	private GameView() {}
 	
-	public GameView(Listener listener, ForceManager forceManager, InputProcessor input) {
+	public GameView(Listener listener, ForceManager forceManager, InputProcessor input,
+			Physics physics) {
 		this.listener = listener;
 		this.forceManager = forceManager;
 		this.inputProcessor = input;
+		this.physics = physics;
 	}
 	
 	
@@ -81,12 +84,7 @@ public class GameView extends View {
 		cam.near = 0.1f;
 		cam.far = 300f;
 		cam.update();
-		
-		//initialize bullet physics
-		Bullet.init();
-		physics = new Physics();
-		physics.setUp(GROUND_HEIGHT, GROUND_WIDTH, SPHERE_HEIGHT);
-		
+			
 		camController = new CameraInputController(cam);
 		//Gdx.input.setInputProcessor(camController);
 		

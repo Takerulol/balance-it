@@ -4,7 +4,10 @@ import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-public class LocalForceManager extends GestureAdapter implements ForceManager {
+/**
+ * This ForceManager provides the force vector by processing gesture input.
+ */
+public class GestureForceManager extends GestureAdapter implements ForceManager {
 
 	/**
 	 * Vector of the force, that should be applied to the sphere.

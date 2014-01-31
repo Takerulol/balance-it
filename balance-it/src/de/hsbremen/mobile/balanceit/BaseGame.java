@@ -53,6 +53,8 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 			//TODO: Throw error and terminate game
 		}
 		
+		
+		Bullet.init();
 		PlayerRole role = PlayerRole.Balancer;
 		
 		this.menuView = new MenuView(this);
