@@ -16,6 +16,8 @@ public interface NetworkManager {
 	 * @param payload
 	 */
 	public abstract void sendPackage(Header header, byte[] payload);
+	
+	public abstract void sendPackage(byte[] message);
 
 	/**
 	 * Message received handler.

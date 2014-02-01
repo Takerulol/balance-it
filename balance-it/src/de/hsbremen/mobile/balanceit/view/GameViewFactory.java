@@ -41,7 +41,7 @@ public class GameViewFactory {
 			case Balancer: 
 				ForceManager remoteManager = createForceManager(role, increaseForce, networkManager);
 				Physics balancerPhysics = createBulletPhysics();
-				balancerPhysics = new SendPhysicsProxy(balancerPhysics, networkManager);
+				balancerPhysics = new SendPhysicsProxy(balancerPhysics, rotation, networkManager);
 				view = new GameView(listener, remoteManager, null, balancerPhysics, rotation); //TODO: CameraInput
 				break;
 				

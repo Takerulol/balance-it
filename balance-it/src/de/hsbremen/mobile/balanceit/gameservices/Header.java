@@ -23,7 +23,12 @@ public enum Header
 	 * Payload:
 	 * Matrix4 rotation matrix.
 	 */
-	GROUND_ROTATION((byte)2); 
+	GROUND_ROTATION((byte)2),
+	
+	/**
+	 * Payload: see SendPhysicsProxy
+	 */
+	WORLD_UPDATE((byte)3);
 	
 	private byte value;
 	
