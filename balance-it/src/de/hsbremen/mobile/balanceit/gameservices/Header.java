@@ -17,7 +17,13 @@ public enum Header
 	 * Payload:
 	 * Matrix4 sphere transform.
 	 */
-	SPHERE_MATRIX((byte)1);
+	SPHERE_MATRIX((byte)1),
+	
+	/**
+	 * Payload:
+	 * Matrix4 rotation matrix.
+	 */
+	GROUND_ROTATION((byte)2); 
 	
 	private byte value;
 	

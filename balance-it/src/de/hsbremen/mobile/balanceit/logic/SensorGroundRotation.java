@@ -43,9 +43,6 @@ public class SensorGroundRotation implements GroundRotation {
 		else if (Math.abs(delta) < MIN_ROTATION_RATE) 
 			newValue = oldValue;
 		
-		String message = "old: " + oldValue + " current: " + value + " new: " + newValue;
-		Gdx.app.log("balance-it", message);
-		
 		return newValue;
 	}
 

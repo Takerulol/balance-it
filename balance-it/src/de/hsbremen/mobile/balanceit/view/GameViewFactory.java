@@ -4,6 +4,7 @@ import com.badlogic.gdx.input.GestureDetector;
 
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.gameservices.RemoteForceManager;
+import de.hsbremen.mobile.balanceit.gameservices.RemoteGroundRotation;
 import de.hsbremen.mobile.balanceit.gameservices.RemotePhysics;
 import de.hsbremen.mobile.balanceit.gameservices.SendPhysicsProxy;
 import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
@@ -33,7 +34,7 @@ public class GameViewFactory {
 		GameView view = null;
 		GestureForceManager manager = null;
 		GestureDetector gestureDetector = null;
-		GroundRotation rotation = new SensorGroundRotation(); //TODO: Networked for ForceApplier
+		GroundRotation rotation = new SensorGroundRotation();
 		
 		//create GameView based on player role
 		switch (role) {
@@ -48,6 +49,7 @@ public class GameViewFactory {
 				manager = new GestureForceManager(); 
 				gestureDetector = new GestureDetector(manager);
 				Physics applierPhysics = new RemotePhysics(networkManager);
+				rotation = new RemoteGroundRotation(networkManager);
 				view = new GameView(listener, manager, gestureDetector, applierPhysics, rotation);
 				break;
 				
