@@ -1,6 +1,7 @@
 package de.hsbremen.mobile.balanceit.view;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.physics.bullet.Bullet;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.GestureForceManager;
 import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
+import de.hsbremen.mobile.balanceit.logic.GroundRotation;
 import de.hsbremen.mobile.balanceit.logic.Physics;
 
 public class GameView extends View {
@@ -51,6 +53,8 @@ public class GameView extends View {
 	private InputProcessor inputProcessor; 
 	
 	Physics physics;
+
+	private GroundRotation groundRotation;
 	
 	
 	/**
@@ -59,11 +63,12 @@ public class GameView extends View {
 	private GameView() {}
 	
 	public GameView(Listener listener, ForceManager forceManager, InputProcessor input,
-			Physics physics) {
+			Physics physics, GroundRotation rotation) {
 		this.listener = listener;
 		this.forceManager = forceManager;
 		this.inputProcessor = input;
 		this.physics = physics;
+		this.groundRotation = rotation;
 	}
 	
 	
@@ -154,13 +159,8 @@ public class GameView extends View {
 	 * Rotates the given model based on the accelerometer data.
 	 */
 	private void rotateModel(ModelInstance model) {
-		float roll = Gdx.input.getRoll();
-		float pitch = Gdx.input.getPitch();
-		
-		Matrix4 rotation = new Matrix4().setToRotation(Vector3.Z, pitch)
-				.mul(new Matrix4().setToRotation(Vector3.X, -roll));
+		Matrix4 rotation = groundRotation.getRotation();
 		model.transform.set(rotation); 
-		//model.transform.rotate(Vector3.X, 0.1f);
 	}
 	
 	private void checkSpherePosition(ModelInstance sphere) {

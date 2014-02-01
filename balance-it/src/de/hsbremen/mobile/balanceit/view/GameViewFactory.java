@@ -10,9 +10,11 @@ import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
 import de.hsbremen.mobile.balanceit.logic.ForceDifficultyManager;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.GestureForceManager;
+import de.hsbremen.mobile.balanceit.logic.GroundRotation;
 import de.hsbremen.mobile.balanceit.logic.Physics;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
 import de.hsbremen.mobile.balanceit.logic.RandomForceManager;
+import de.hsbremen.mobile.balanceit.logic.SensorGroundRotation;
 
 /**
  * This class creates a GameView class based on given options.
@@ -31,6 +33,7 @@ public class GameViewFactory {
 		GameView view = null;
 		GestureForceManager manager = null;
 		GestureDetector gestureDetector = null;
+		GroundRotation rotation = new SensorGroundRotation(); //TODO: Networked for ForceApplier
 		
 		//create GameView based on player role
 		switch (role) {
@@ -38,20 +41,20 @@ public class GameViewFactory {
 				ForceManager remoteManager = createForceManager(role, increaseForce, networkManager);
 				Physics balancerPhysics = createBulletPhysics();
 				balancerPhysics = new SendPhysicsProxy(balancerPhysics, networkManager);
-				view = new GameView(listener, remoteManager, null, balancerPhysics); //TODO: CameraInput
+				view = new GameView(listener, remoteManager, null, balancerPhysics, rotation); //TODO: CameraInput
 				break;
 				
 			case ForceApplier:
 				manager = new GestureForceManager(); 
 				gestureDetector = new GestureDetector(manager);
 				Physics applierPhysics = new RemotePhysics(networkManager);
-				view = new GameView(listener, manager, gestureDetector, applierPhysics);
+				view = new GameView(listener, manager, gestureDetector, applierPhysics, rotation);
 				break;
 				
 			case SinglePlayer:
 				ForceManager randomManager = createForceManager(role, increaseForce, networkManager);
 				Physics singlePlayerPhysics = createBulletPhysics();
-				view = new GameView(listener, randomManager, null, singlePlayerPhysics); //TODO: CameraInput
+				view = new GameView(listener, randomManager, null, singlePlayerPhysics, rotation); //TODO: CameraInput
 				break;
 				
 		}
