@@ -5,8 +5,8 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/balance-it"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry exported="true" kind="lib" path="/balance-it/libs/gdx.jar" sourcepath="/balance-it/libs/gdx-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/gdx-backend-android.jar" sourcepath="libs/gdx-backend-android-sources.jar"/>
+	<classpathentry kind="lib" path="/balance-it/libs/gdx.jar" sourcepath="/balance-it/libs/gdx-sources.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-android.jar" sourcepath="libs/gdx-backend-android-sources.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="lib" path="/balance-it/libs/gdx-bullet.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>

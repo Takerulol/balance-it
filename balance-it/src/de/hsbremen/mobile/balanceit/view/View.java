@@ -4,7 +4,9 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 
-public abstract class View implements ApplicationListener {
+import de.hsbremen.mobile.balanceit.gameservices.GameServiceClient;
+
+public abstract class View implements ApplicationListener, GameServiceClient {
 	@Override
 	public final void render() {
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

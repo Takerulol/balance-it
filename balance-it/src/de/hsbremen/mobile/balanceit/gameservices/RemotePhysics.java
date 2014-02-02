@@ -13,6 +13,7 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	private NetworkManager networkManager;
 	private Matrix4 sphereTransform;
+	private Vector3 lastForce = Vector3.Zero;
 
 	public RemotePhysics(NetworkManager manager) {
 		this.networkManager = manager;
@@ -29,8 +30,12 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	@Override
 	public void applyForceToSphere(Vector3 force) {
-		byte[] payload = ByteConverter.toByte(force);
-		this.networkManager.sendPackage(Header.FORCE_VECTOR, payload);
+		//only send packages, if the force has been altered.
+		if (!lastForce.equals(force)) {
+			byte[] payload = ByteConverter.toByte(force);
+			this.networkManager.sendPackage(Header.FORCE_VECTOR, payload);
+			lastForce = force;
+		}
 	}
 	
 
