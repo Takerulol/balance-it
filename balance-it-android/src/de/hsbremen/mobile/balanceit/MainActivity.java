@@ -2,6 +2,7 @@ package de.hsbremen.mobile.balanceit;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -16,6 +17,8 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 	
     private final int RC_RESOLVE = 5000, RC_UNUSED = 5001;
 	private final static int RC_INVITATION_INBOX = 10001, RC_SELECT_PLAYERS = 10000;
+
+	private static final String TAG = "MainActivity";
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -114,6 +117,18 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 	@Override
 	public void addMultiplayerLoss() {
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void invitePlayers() {
+		Log.d(TAG, "Inviting players..");
+		if (isLoggedIn()) {
+			Intent intent = this.gameHelper.getGamesClient().getSelectPlayersIntent(1, 3);
+			startActivityForResult(intent, RC_SELECT_PLAYERS);
+        } else {
+        	Log.d(TAG, "InvitePlayers Error: Not logged in.");
+        }
 		
 	}
 }

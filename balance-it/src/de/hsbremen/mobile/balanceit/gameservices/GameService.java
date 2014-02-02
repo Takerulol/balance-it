@@ -12,4 +12,5 @@ public interface GameService {
 	void incrementGamePlayed();
 	void addMultiplayerWin();
 	void addMultiplayerLoss();
+	void invitePlayers();
 }

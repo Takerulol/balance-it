@@ -30,10 +30,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.Input.Peripheral;
 
-import de.hsbremen.mobile.balanceit.gameservices.GameService;
+<<<<<<< HEAD
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
+=======
+import de.hsbremen.mobile.balanceit.gameservices.GameService;
+>>>>>>> 6d99463424fa875819379ba134ae7a74cee9f1fa
 import de.hsbremen.mobile.balanceit.view.GameView;
 import de.hsbremen.mobile.balanceit.view.GameViewFactory;
 import de.hsbremen.mobile.balanceit.view.MenuView;
@@ -71,12 +74,15 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		NetworkManager networkManager = null;
 		
 		this.menuView = new MenuView(this);
+<<<<<<< HEAD
 		this.gameView = new GameViewFactory().createGameView(this, role, true, networkManager);
-
+=======
+        this.gameView = new GameView(this);
         
         if(this.gameService != null) {
         	this.menuView.setGameService(this.gameService);
         }
+>>>>>>> 6d99463424fa875819379ba134ae7a74cee9f1fa
 		
 		changeView(this.menuView);
 	}
