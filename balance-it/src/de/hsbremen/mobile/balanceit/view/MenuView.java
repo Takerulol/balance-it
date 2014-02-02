@@ -162,9 +162,18 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
+		TextButton showInvitationsButton = new TextButton("Show Invitations", skin);
+		showInvitationsButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				gameService.showInvitations();				
+			}
+		});
+		
 		this.loggedInMenu.add(logoutButton);
 		this.loggedInMenu.add(achievementsButton);
 		this.loggedInMenu.add(invitePlayersButton);
+		this.loggedInMenu.add(showInvitationsButton);
 		
 		
 		//not logged in

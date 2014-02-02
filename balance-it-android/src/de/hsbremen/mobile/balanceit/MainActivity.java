@@ -15,6 +15,7 @@ import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
+import de.hsbremen.mobile.googleplay.InvitationManager;
 import de.hsbremen.mobile.googleplay.NetworkManagerImpl;
 import de.hsbremen.mobile.googleplay.RoomManager;
 
@@ -29,6 +30,8 @@ public class MainActivity extends AndroidApplication
 	private static final String TAG = "MainActivity";
 	private List<GameService.Listener> listener;
 	private RoomManager roomManager;
+
+	private InvitationManager invitationManager;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,8 +41,6 @@ public class MainActivity extends AndroidApplication
         gameHelper = new GameHelper(this);
         gameHelper.enableDebugLog(true, "BIPS");
         
-        roomManager = new RoomManager(this, gameHelper.getGamesClient());
-        
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.useGL20 = true;
         
@@ -48,6 +49,14 @@ public class MainActivity extends AndroidApplication
         initialize(new BaseGame(this), cfg);
         this.gameHelper.setup(this);
     }
+	
+	private void initializeHelperClasses()
+	{
+		//google play initializations
+		this.roomManager = new RoomManager(this,gameHelper.getGamesClient());
+		this.roomManager.addListener(this);
+		this.invitationManager = new InvitationManager(gameHelper.getGamesClient(),this.roomManager);
+	}
 	
 	@Override
 	protected void onStart() {
@@ -75,7 +84,9 @@ public class MainActivity extends AndroidApplication
 
 	@Override
 	public void onSignInSucceeded() {
-		// TODO Auto-generated method stub
+		initializeHelperClasses();
+		//handle possible invitations
+		this.invitationManager.handleInvitation(this.gameHelper.getInvitationId());
 		
 	}
 
@@ -171,5 +182,15 @@ public class MainActivity extends AndroidApplication
 		for (GameService.Listener listener : this.listener) {
 			listener.startMultiplayerGame(role, manager);
 		}
+	}
+
+	@Override
+	public void showInvitations() {
+		if (isLoggedIn()) {
+			Intent intent = this.gameHelper.getGamesClient().getInvitationInboxIntent();
+			this.startActivityForResult(intent, RC_INVITATION_INBOX);	
+        } else {
+        	Log.d(TAG, "ShowInvitations error: Not logged in.");
+        }
 	}
 }

@@ -22,6 +22,7 @@ public interface GameService {
 	
 	void showAchievements();
 	void showLeaderboards();
+	void showInvitations();
 	
 	void submitScore(float score);
 	void incrementGamePlayed();
