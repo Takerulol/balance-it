@@ -39,7 +39,7 @@ import de.hsbremen.mobile.balanceit.view.GameViewFactory;
 import de.hsbremen.mobile.balanceit.view.MenuView;
 import de.hsbremen.mobile.balanceit.view.View;
 
-public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener {
+public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener, GameService.Listener {
 	
 	View menuView;
 	View gameView;
@@ -47,6 +47,8 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	View currentView;
 	
 	private final GameService gameService;
+	private NetworkManager networkManager = null;
+	private static final boolean INCREASE_DIFFICULTY = true;
 	
 	public BaseGame() {
 		this.gameService = null;
@@ -68,10 +70,10 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		
 		Bullet.init();
 		PlayerRole role = PlayerRole.SinglePlayer;
-		NetworkManager networkManager = null;
+		
 		
 		this.menuView = new MenuView(this);
-		this.gameView = new GameViewFactory().createGameView(this, role, true, networkManager);
+		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager);
 
         
         if(this.gameService != null) {
@@ -104,7 +106,8 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	}
 
 	@Override
-	public void startGame() {
+	public void startGame(PlayerRole role) {
+		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager);
 		changeView(this.gameView);
 	}
 	
@@ -118,5 +121,11 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 				this.currentView.dispose();
 		this.currentView = view;
 		this.currentView.create();
+	}
+
+	@Override
+	public void startMultiplayerGame(PlayerRole role, NetworkManager manager) {
+		this.networkManager = manager;
+		this.startGame(role);
 	}
 }

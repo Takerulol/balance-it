@@ -19,6 +19,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig.Builder;
 import com.google.example.games.basegameutils.BaseGameActivity;
 
+import de.hsbremen.mobile.balanceit.MainActivity;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 
 
@@ -43,7 +44,7 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	
 	// are we already playing?
 	private boolean mPlaying = false;
-	private BaseGameActivity activity;
+	private MainActivity activity;
 	private GamesClient gamesClient;
 	private String mRoomId = null;
 	private String participantId = null;
@@ -54,7 +55,7 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 
 	private List<Listener> listenerList;
 	
-	public RoomManager(BaseGameActivity activity, GamesClient gamesClient)
+	public RoomManager(MainActivity activity, GamesClient gamesClient)
 	{
 		this.activity = activity;
 		this.gamesClient = gamesClient;

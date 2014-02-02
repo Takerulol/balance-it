@@ -10,13 +10,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.GameServiceClient;
+import de.hsbremen.mobile.balanceit.logic.PlayerRole;
 
 public class MenuView extends View implements GameServiceClient {
 	
 	private GameService gameService;
 	
 	public static interface Listener {
-		void startGame();
+		void startGame(PlayerRole role);
 	}
 	
 	private Listener listener;
@@ -30,12 +31,6 @@ public class MenuView extends View implements GameServiceClient {
 	private Table gameServiceMenu = null;
 	private Table loggedInMenu;
 	private Table loggedOutMenu;
-	
-	/**
-	 * private to enforce listener
-	 */
-	@SuppressWarnings("unused")
-	private MenuView() {}
 	
 	public MenuView(Listener listener) {
 		this.listener = listener;
@@ -53,7 +48,7 @@ public class MenuView extends View implements GameServiceClient {
 		startGameButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				listener.startGame();				
+				listener.startGame(PlayerRole.SinglePlayer);				
 			}
 		});
 		

@@ -1,5 +1,8 @@
 package de.hsbremen.mobile.balanceit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,8 +13,13 @@ import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
+import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
+import de.hsbremen.mobile.balanceit.logic.PlayerRole;
+import de.hsbremen.mobile.googleplay.NetworkManagerImpl;
+import de.hsbremen.mobile.googleplay.RoomManager;
 
-public class MainActivity extends AndroidApplication implements GameHelperListener, GameService {
+public class MainActivity extends AndroidApplication 
+	implements GameHelperListener, GameService, RoomManager.Listener {
     
 	private GameHelper gameHelper;
 	
@@ -19,13 +27,18 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 	private final static int RC_INVITATION_INBOX = 10001, RC_SELECT_PLAYERS = 10000;
 
 	private static final String TAG = "MainActivity";
+	private List<GameService.Listener> listener;
+	private RoomManager roomManager;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        listener = new ArrayList<GameService.Listener>();
         
         gameHelper = new GameHelper(this);
         gameHelper.enableDebugLog(true, "BIPS");
+        
+        roomManager = new RoomManager(this, gameHelper.getGamesClient());
         
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.useGL20 = true;
@@ -122,13 +135,41 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 
 	@Override
 	public void invitePlayers() {
-		Log.d(TAG, "Inviting players..");
 		if (isLoggedIn()) {
-			Intent intent = this.gameHelper.getGamesClient().getSelectPlayersIntent(1, 3);
+			Intent intent = this.gameHelper.getGamesClient().getSelectPlayersIntent(2, 2);
 			startActivityForResult(intent, RC_SELECT_PLAYERS);
         } else {
         	Log.d(TAG, "InvitePlayers Error: Not logged in.");
         }
 		
+	}
+
+	@Override
+	public void addListener(Listener listener) {
+		this.listener.add(listener);
+	}
+
+	@Override
+	public void removeListener(Listener listener) {
+		this.listener.remove(listener);
+	}
+
+	@Override
+	public void onStartMultiplayerGame(boolean firstPlayer) {
+		PlayerRole role;
+		
+		if (firstPlayer) 
+			role = PlayerRole.Balancer;
+		else 
+			role = PlayerRole.ForceApplier;
+		
+		//initialize network manager and set the NetworkManager in the RoomManager
+		NetworkManager manager = new NetworkManagerImpl(this.gameHelper.getGamesClient(),
+				this.roomManager.getRoomId(), this.roomManager.getParticipantId());
+		this.roomManager.setNetworkManager(manager);
+		
+		for (GameService.Listener listener : this.listener) {
+			listener.startMultiplayerGame(role, manager);
+		}
 	}
 }
