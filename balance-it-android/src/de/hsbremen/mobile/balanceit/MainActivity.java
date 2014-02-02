@@ -3,12 +3,15 @@ package de.hsbremen.mobile.balanceit;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.google.android.gms.games.GamesClient;
+import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
@@ -74,6 +77,35 @@ public class MainActivity extends AndroidApplication
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		this.gameHelper.onActivityResult(requestCode, resultCode, data);
+		
+		if (requestCode == RC_INVITATION_INBOX) {
+	        if (resultCode != Activity.RESULT_OK) {
+	            // canceled
+	            return;
+	        }
+
+	        // get the selected invitation
+	        Bundle extras = data.getExtras();
+	        Invitation invitation =
+	            extras.getParcelable(GamesClient.EXTRA_INVITATION);
+
+	        // accept it!
+	        this.invitationManager.handleInvitation(invitation.getInvitationId());
+	    }
+	    
+	    else if (requestCode == RC_SELECT_PLAYERS) {
+	        if (resultCode != Activity.RESULT_OK) {
+	            // user canceled
+	            return;
+	        }
+
+	        // get the invitee list
+	        Bundle extras = data.getExtras();
+	        final ArrayList<String> invitees =
+	            data.getStringArrayListExtra(GamesClient.EXTRA_PLAYERS);
+
+	        this.roomManager.handleAutoMatching(invitees);
+	    }
 	}
 
 	@Override
