@@ -61,9 +61,10 @@ public class MenuView extends View implements GameServiceClient {
 		this.menuTable = new Table(skin);
 		this.menuTable.setPosition(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
 		 
-		if(this.gameService != null)
+		if(this.gameService != null) {
 			initializeGameServiceMenu();
-		
+		}
+
 		//Add buttons
 		this.menuTable.add(startGameButton);
 		
@@ -93,13 +94,13 @@ public class MenuView extends View implements GameServiceClient {
 	private void checkMenuStatus() {
 		if(this.gameService != null) {
 			if(this.gameService.isLoggedIn()) {
-				if(this.tempLoggedInState == false) {
+//				if(this.tempLoggedInState == false) {
 					switchLoggedInMenuState(true);
-				}
+//				}
 			} else {
-				if(this.tempLoggedInState == true) {
+//				if(this.tempLoggedInState == true) {
 					switchLoggedInMenuState(false);
-				}
+//				}
 			}
 		}
 	} 
@@ -126,44 +127,63 @@ public class MenuView extends View implements GameServiceClient {
 	}
 
 	private void initializeGameServiceMenu() {
-		//TODO: implement me!
 		buildGameServiceMenus();
 		
 		if(this.gameService.isLoggedIn()) {
-			
+			this.gameServiceMenu.add(this.loggedInMenu);
 		} else {
-			
+			this.gameServiceMenu.add(this.loggedOutMenu);
 		}
 	}
 	
 	private void buildGameServiceMenus() {
 		this.gameServiceMenu = new Table(skin);
+		this.menuTable.add(this.gameServiceMenu); //add to main menu
 		
 		//logged in
 		this.loggedInMenu = new Table(skin);
 		
+		TextButton logoutButton = new TextButton("Logout", skin);
+		logoutButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				gameService.logout();				
+			}
+		});
 		
+		TextButton achievementsButton = new TextButton("Achievements", skin);
+		achievementsButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				gameService.showAchievements();				
+			}
+		});
+		
+		this.loggedInMenu.add(logoutButton);
+		this.loggedInMenu.add(achievementsButton);
 		
 		
 		//not logged in
 		this.loggedOutMenu = new Table(skin);
 		
-		TextButton startGameButton = new TextButton("Login", skin);
-		startGameButton.addListener(new ChangeListener() {
+		TextButton loginButton = new TextButton("Login", skin);
+		loginButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				gameService.login();				
 			}
 		});
+		
+		this.loggedOutMenu.add(loginButton);
 	}
 
 	private void switchLoggedInMenuState(boolean loggedIn) {
 		if (loggedIn) {
 			this.gameServiceMenu.removeActor(this.loggedOutMenu);
-			this.gameServiceMenu.addActor(this.loggedInMenu);
+			this.gameServiceMenu.add(this.loggedInMenu);
 		} else {
 			this.gameServiceMenu.removeActor(this.loggedInMenu);
-			this.gameServiceMenu.addActor(this.loggedOutMenu);
+			this.gameServiceMenu.add(this.loggedOutMenu);
 		}
 		
 	}

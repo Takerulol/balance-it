@@ -11,8 +11,12 @@ import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 
 public class MainActivity extends AndroidApplication implements GameHelperListener, GameService {
-    private GameHelper gameHelper;
+    
+	private GameHelper gameHelper;
 	
+    private final int RC_RESOLVE = 5000, RC_UNUSED = 5001;
+	private final static int RC_INVITATION_INBOX = 10001, RC_SELECT_PLAYERS = 10000;
+    
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,29 +27,28 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.useGL20 = true;
         
-        initialize(new BaseGame(), cfg);
+//        initialize(new BaseGame(), cfg);
         
-//        initialize(new BaseGame(this), cfg);
-        
-//        this.gameHelper.setup(this);
+        initialize(new BaseGame(this), cfg);
+        this.gameHelper.setup(this);
     }
 	
 	@Override
 	protected void onStart() {
 		super.onStart();
-//		this.gameHelper.onStart(this);
+		this.gameHelper.onStart(this);
 	}
 	
 	@Override
 	protected void onStop() {
 		super.onStop();
-//		this.gameHelper.onStop();
+		this.gameHelper.onStop();
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-//		this.gameHelper.onActivityResult(requestCode, resultCode, data);
+		this.gameHelper.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@Override
@@ -77,8 +80,11 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 
 	@Override
 	public void showAchievements() {
-		// TODO Auto-generated method stub
-		
+		if(isLoggedIn()) {
+			startActivityForResult(this.gameHelper.getGamesClient().getAchievementsIntent(), RC_UNUSED);
+		} else {
+			this.gameHelper.showAlert("not logged in");
+		}
 	}
 
 	@Override
