@@ -126,10 +126,12 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	@Override
 	public void onPeersConnected(Room room, List<String> peers) {
 		mRoom = room;
+		Log.d(TAG, "onPeersConnected.");
 	    if (mPlaying) {
 	        // add new player to an ongoing game
 	    }
 	    else if (shouldStartGame(room)) {
+	    	Log.d(TAG, "Notifing Listener.");
 	        notifyListener();
 	    }
 	}

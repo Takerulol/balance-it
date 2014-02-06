@@ -74,6 +74,13 @@ public class MainActivity extends AndroidApplication
 	}
 	
 	@Override
+	protected void onPause() {
+		if(this.roomManager != null)
+			this.roomManager.leaveRoom();
+		super.onPause();
+	}
+	
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		this.gameHelper.onActivityResult(requestCode, resultCode, data);
@@ -206,12 +213,15 @@ public class MainActivity extends AndroidApplication
 		else 
 			role = PlayerRole.ForceApplier;
 		
+		Log.d(TAG, "Starting multiplayer game as role " + role);
+		
 		//initialize network manager and set the NetworkManager in the RoomManager
 		NetworkManager manager = new NetworkManagerImpl(this.gameHelper.getGamesClient(),
 				this.roomManager.getRoomId(), this.roomManager.getParticipantId());
 		this.roomManager.setNetworkManager(manager);
 		
 		for (GameService.Listener listener : this.listener) {
+			Log.d(TAG, "Notifing GameService listener.");
 			listener.startMultiplayerGame(role, manager);
 		}
 	}

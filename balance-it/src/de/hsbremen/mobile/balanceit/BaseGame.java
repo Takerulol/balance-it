@@ -56,6 +56,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	
 	public BaseGame(GameService gameService) {
 		this.gameService = gameService;
+		this.gameService.addListener(this);
 	}
 
 	@Override
@@ -85,7 +86,9 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 
 	@Override
 	public void dispose() {
-
+		if (this.gameService != null) {
+			this.gameService.removeListener(this);
+		}
 	}
 
 	@Override
@@ -125,6 +128,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 
 	@Override
 	public void startMultiplayerGame(PlayerRole role, NetworkManager manager) {
+		Gdx.app.log("BaseGame", "Starting multiplayer game as role " + role);
 		this.networkManager = manager;
 		this.startGame(role);
 	}
