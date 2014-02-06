@@ -20,13 +20,14 @@ public abstract class ByteConverter {
 		return buffer.array();
 	}
 	
+	
 	public static Vector3 toVector3(byte[] values, int offset) {
-		ByteBuffer buffer = ByteBuffer.wrap(values, offset, values.length - offset);
-		float x = buffer.getFloat(0);
-		float y = buffer.getFloat(4);
-		float z = buffer.getFloat(8);
+		ByteBuffer buffer = ByteBuffer.wrap(values);
+		float x = buffer.getFloat(0 + offset);
+		float y = buffer.getFloat(4 + offset);
+		float z = buffer.getFloat(8 + offset);
 		return new Vector3(x, y, z);
-	}
+	} 
 	
 	public static byte[] toByte(Matrix4 matrix4) {
 		float[] values = matrix4.val;
@@ -39,14 +40,15 @@ public abstract class ByteConverter {
 		return buffer.array();
 	}
 	
+	
 	public static Matrix4 toMatrix4(byte[] values, int offset) {
-		ByteBuffer buffer = ByteBuffer.wrap(values, offset, values.length - offset);
-		float[] array = new float[buffer.limit() / 4];
+		ByteBuffer buffer = ByteBuffer.wrap(values);
+		float[] array = new float[(values.length - offset) / 4];
 		
 		int i = 0;
 		int index = 0;
-		while (index < buffer.limit()) {
-			array[i] = buffer.getFloat(index);
+		while ((index + offset) < buffer.limit()) {
+			array[i] = buffer.getFloat(index + offset);
 			i++;
 			index = i * 4;
 		}
