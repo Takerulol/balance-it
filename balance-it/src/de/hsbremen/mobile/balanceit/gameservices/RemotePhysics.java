@@ -1,5 +1,6 @@
 package de.hsbremen.mobile.balanceit.gameservices;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
@@ -14,6 +15,8 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 	private NetworkManager networkManager;
 	private Matrix4 sphereTransform;
 	private Vector3 lastForce = Vector3.Zero;
+	
+	private static final String TAG = "RemotePhysics";
 
 	public RemotePhysics(NetworkManager manager) {
 		this.networkManager = manager;
@@ -42,8 +45,10 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 	@Override
 	public void onMessageReceived(byte[] data) {
 		//set the sphere transform according to the package
-		
 		Header header = Header.fromValue(data[0]);
+		
+		Gdx.app.log(TAG, "Message received with Header " + header.toString());
+		
 		if (header.equals(Header.SPHERE_MATRIX)) {
 			sphereTransform = ByteConverter.toMatrix4(data, 1);
 		}

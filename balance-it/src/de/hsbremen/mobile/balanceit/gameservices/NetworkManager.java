@@ -1,12 +1,13 @@
 package de.hsbremen.mobile.balanceit.gameservices;
 
+
 public interface NetworkManager {
 
 	public interface Listener {
 		void onMessageReceived(byte[] data);
 	}
 	
-	public abstract void registerListener(Listener listener); //TODO: This has to accept multiple listeners
+	public abstract void registerListener(Listener listener);
 
 	public abstract void unregisterListener(Listener listener);
 

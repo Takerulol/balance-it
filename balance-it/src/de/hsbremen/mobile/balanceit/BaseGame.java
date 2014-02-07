@@ -32,6 +32,7 @@ import com.badlogic.gdx.Input.Peripheral;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
+import de.hsbremen.mobile.balanceit.gameservices.NetworkManagerProxy;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
 import de.hsbremen.mobile.balanceit.view.GameView;
@@ -129,7 +130,12 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	@Override
 	public void startMultiplayerGame(PlayerRole role, NetworkManager manager) {
 		Gdx.app.log("BaseGame", "Starting multiplayer game as role " + role);
-		this.networkManager = manager;
+		setNetworkManager(manager);
 		this.startGame(role);
+	}
+	
+	public void setNetworkManager(NetworkManager manager) {
+		NetworkManager proxy = new NetworkManagerProxy(manager);
+		this.networkManager = proxy;
 	}
 }

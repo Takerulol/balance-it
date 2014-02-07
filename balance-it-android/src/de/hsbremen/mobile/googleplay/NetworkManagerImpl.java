@@ -104,6 +104,7 @@ public class NetworkManagerImpl implements NetworkManager {
 	public void sendPackage(byte[] message) {
 		client.sendReliableRealTimeMessage(null, message, roomId, participantId);
 	}
+
 	
 	
 }

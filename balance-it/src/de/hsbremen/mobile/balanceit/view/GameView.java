@@ -75,11 +75,13 @@ public class GameView extends View {
 	
 	@Override
 	public void create() {
+		modelBatch = new ModelBatch();
+		
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight,0.4f,0.4f,0.4f,1f));
 		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 		
-		modelBatch = new ModelBatch();
+		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		
