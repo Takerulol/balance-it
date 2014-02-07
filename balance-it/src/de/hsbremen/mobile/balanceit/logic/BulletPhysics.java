@@ -77,7 +77,7 @@ public class BulletPhysics implements Physics {
 		sphereMotionState.setWorldTransform(transform);
 		
 		//Trägheit
-		Vector3 fallInertia = Vector3.Zero;
+		Vector3 fallInertia = new Vector3();
 		fallShape.calculateLocalInertia(SPHERE_MASS, fallInertia);
 		
 		sphereInfo = new btRigidBodyConstructionInfo
@@ -96,7 +96,7 @@ public class BulletPhysics implements Physics {
 		groundMotionState = new btDefaultMotionState();
 		groundMotionState.setWorldTransform(transform);
 		groundInfo = new btRigidBodyConstructionInfo
-				(0f, groundMotionState, groundShape, Vector3.Zero);
+				(0f, groundMotionState, groundShape, new Vector3());
 		ground = new btRigidBody(groundInfo);
 		dynamicsWorld.addRigidBody(ground);
 	}
