@@ -49,7 +49,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	
 	private final GameService gameService;
 	private NetworkManager networkManager = null;
-	private static final boolean INCREASE_DIFFICULTY = true;
+	private static final boolean INCREASE_DIFFICULTY = false;
 	
 	public BaseGame() {
 		this.gameService = null;

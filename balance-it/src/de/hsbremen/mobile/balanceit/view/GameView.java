@@ -58,11 +58,6 @@ public class GameView extends View {
 	private GroundRotation groundRotation;
 	
 	
-	/**
-	 * private to enforce listener
-	 */
-	private GameView() {}
-	
 	public GameView(Listener listener, ForceManager forceManager, InputProcessor input,
 			Physics physics, GroundRotation rotation) {
 		this.listener = listener;
@@ -167,7 +162,7 @@ public class GameView extends View {
 	}
 	
 	private void checkSpherePosition(ModelInstance sphere) {
-		Vector3 position = Vector3.Zero;
+		Vector3 position = new Vector3();
 		sphere.transform.getTranslation(position);
 		if (position.y < MIN_BALL_Y_POSITION) {
 			//reset ball
@@ -192,6 +187,9 @@ public class GameView extends View {
 		//update physics
 		physics.setGroundTransform(instance.transform);
 		applyForce();
+		
+		logForce(Gdx.graphics.getDeltaTime());
+		
 		physics.update(Gdx.graphics.getDeltaTime());
 		instance2.transform = physics.getSphereTransform();
 		checkSpherePosition(instance2);
@@ -210,6 +208,22 @@ public class GameView extends View {
 	@Override
 	public void setGameService(GameService gameService) {
 		//TODO: implement me
+	}
+	
+	//TODO: Remove
+	private float logTimer = 0.0f;
+	
+	/**
+	 * TODO: Remove
+	 * @param deltaTime
+	 */
+	private void logForce(float deltaTime) {
+		logTimer += deltaTime;
+		
+		if (logTimer > 3) {
+			Gdx.app.log("GameView", "Current force: " + forceManager.getForceVector().toString());
+			logTimer = 0;
+		}
 	}
 
 }

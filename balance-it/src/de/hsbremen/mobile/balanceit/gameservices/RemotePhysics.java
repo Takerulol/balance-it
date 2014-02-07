@@ -35,6 +35,9 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 	public void applyForceToSphere(Vector3 force) {
 		//only send packages, if the force has been altered.
 		if (!lastForce.equals(force)) {
+			
+			Gdx.app.log(TAG, "Sending force: " + force.toString());
+			
 			byte[] payload = ByteConverter.toByte(force);
 			this.networkManager.sendPackage(Header.FORCE_VECTOR, payload);
 			lastForce = force;
@@ -47,7 +50,7 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 		//set the sphere transform according to the package
 		Header header = Header.fromValue(data[0]);
 		
-		Gdx.app.log(TAG, "Message received with Header " + header.toString());
+		//Gdx.app.log(TAG, "Message received with Header " + header.toString());
 		
 		if (header.equals(Header.SPHERE_MATRIX)) {
 			sphereTransform = ByteConverter.toMatrix4(data, 1);

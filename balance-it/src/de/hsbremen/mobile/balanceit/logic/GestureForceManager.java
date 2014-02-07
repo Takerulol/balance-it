@@ -12,7 +12,7 @@ public class GestureForceManager extends GestureAdapter implements ForceManager 
 	/**
 	 * Vector of the force, that should be applied to the sphere.
 	 */
-	private Vector3 forceVector = Vector3.Zero;
+	private Vector3 forceVector = new Vector3();
 	
 	
 	@Override
