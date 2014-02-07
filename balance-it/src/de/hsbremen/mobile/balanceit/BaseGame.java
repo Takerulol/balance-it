@@ -51,6 +51,8 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	private NetworkManager networkManager = null;
 	private static final boolean INCREASE_DIFFICULTY = false;
 	
+	private boolean createView = false;
+	
 	public BaseGame() {
 		this.gameService = null;
 	}
@@ -94,6 +96,10 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 
 	@Override
 	public void render() {
+		if (this.createView) {
+			this.currentView.create();
+			this.createView = false;
+		}
 		this.currentView.render();
 	}
 
@@ -124,7 +130,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		if(this.currentView != null )
 				this.currentView.dispose();
 		this.currentView = view;
-		this.currentView.create();
+		this.createView = true;
 	}
 
 	@Override
