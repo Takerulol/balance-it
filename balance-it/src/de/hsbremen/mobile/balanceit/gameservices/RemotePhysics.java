@@ -14,9 +14,10 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	private NetworkManager networkManager;
 	private Matrix4 sphereTransform;
-	private Vector3 lastForce = new Vector3();
 	
 	private static final String TAG = "RemotePhysics";
+	
+	private float updateTimer = 0.0f;
 
 	public RemotePhysics(NetworkManager manager) {
 		this.networkManager = manager;
@@ -33,14 +34,11 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	@Override
 	public void applyForceToSphere(Vector3 force) {
-		//only send packages, if the force has been altered.
-		if (!lastForce.equals(force)) {
-			
-			Gdx.app.log(TAG, "Sending force: " + force.toString());
-			
+		//send current force, if update is required
+		if (updateTimer >= SendPhysicsProxy.UPDATE_INTERVAL) {
 			byte[] payload = ByteConverter.toByte(force);
 			this.networkManager.sendPackage(Header.FORCE_VECTOR, payload);
-			lastForce = force;
+			updateTimer = 0.0f;
 		}
 	}
 	
