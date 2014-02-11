@@ -121,7 +121,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 
 	@Override
 	public void startGame(PlayerRole role) {
-		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager);
+		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer);
 		changeView(this.gameView);
 	}
 	

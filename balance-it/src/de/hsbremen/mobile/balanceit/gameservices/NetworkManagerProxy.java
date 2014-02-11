@@ -1,6 +1,7 @@
 package de.hsbremen.mobile.balanceit.gameservices;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
@@ -16,6 +17,9 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 	private NetworkManager instance;
 	private List<Listener> listener;
 	private Timer timer;
+	
+	private long sequenceNumber = 1;
+	private long lastReceivedSequenceNumber = 0;
 	
 	public NetworkManagerProxy(NetworkManager instance, Timer timer) {
 		this.instance = instance;
@@ -38,14 +42,23 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 
 	@Override
 	public void sendPackage(Header header, byte[] payload) {
-		this.instance.sendPackage(header, payload);
-
+		DataPackage pkg = createPackage(header, payload);
+		this.instance.sendPackage(pkg.toByte());
 	}
 
 	@Override
 	public void sendPackage(byte[] message) {
-		this.instance.sendPackage(message);
-
+		byte[] payload = Arrays.copyOfRange(message, 1, message.length);
+		sendPackage(Header.fromValue(message[0]), payload);
+	}
+	
+	private DataPackage createPackage(Header header, byte[] payload) {
+		DataPackage pkg = new DataPackage(header, timer.getLocalTime(), 
+				sequenceNumber, lastReceivedSequenceNumber, payload);
+		
+		sequenceNumber++;
+		
+		return pkg;
 	}
 
 	@Override
@@ -53,9 +66,9 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 		this.instance.onRealTimeMessageReceived(message);
 	}
 	
-	private void notifyListener(byte[] pkg) {
+	private void notifyListener(DataPackage pkg) {
 		for (Listener listener : getListener()) {
-			listener.onMessageReceived(pkg);
+			listener.onPackageReceived(pkg);
 		}
 	}
 
@@ -64,16 +77,16 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 	}
 
 	@Override
-	public void onMessageReceived(byte[] message) {
+	public void onPackageReceived(DataPackage message) {
 		//split the message, if its a world update
-		Header header = Header.fromValue(message[0]);
+		Header header = message.getHeader();
 		
 		Gdx.app.log("NetworkManagerProxy", "Received message with header " + header);
 		
 		if (header.equals(Header.WORLD_UPDATE)) {
-			List<byte[]> packages = PackageConverter.getPackages(message);
+			List<DataPackage> packages = PackageConverter.getPackages(message);
 			
-			for (byte[] pkg : packages) {
+			for (DataPackage pkg : packages) {
 				notifyListener(pkg);
 			}
 		}

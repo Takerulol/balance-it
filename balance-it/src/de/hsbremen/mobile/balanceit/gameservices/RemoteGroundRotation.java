@@ -24,11 +24,11 @@ public class RemoteGroundRotation implements GroundRotation, NetworkManager.List
 	}
 
 	@Override
-	public void onMessageReceived(byte[] data) {
-		Header header = Header.fromValue(data[0]);
+	public void onPackageReceived(DataPackage data) {
+		Header header = data.getHeader();
 		
 		if (header.equals(Header.GROUND_ROTATION)) {
-			currentRotation = ByteConverter.toMatrix4(data, 1);
+			currentRotation = ByteConverter.toMatrix4(data.getPayload(), 0);
 		}
 	}
 

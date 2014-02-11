@@ -7,10 +7,12 @@ import java.util.Observable;
 
 import android.util.Log;
 
+import com.badlogic.gdx.Gdx;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
 
+import de.hsbremen.mobile.balanceit.gameservices.DataPackage;
 import de.hsbremen.mobile.balanceit.gameservices.Header;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 
@@ -86,10 +88,20 @@ public class NetworkManagerImpl implements NetworkManager {
 		Log.d("NETWORK_MANAGER", "Message received.");
 		Log.d("NETWORK_MANAGER", "byte length: " + message.length);
 		
-		//notify observers, that a new message has been received. 
-		for (NetworkManager.Listener listener : this.listener) {
-			listener.onMessageReceived(message);
+		try {
+			DataPackage pkg = DataPackage.fromByte(message);
+			//notify observers, that a new message has been received. 
+			for (NetworkManager.Listener listener : this.listener) {
+				listener.onPackageReceived(pkg);
+			}
 		}
+		
+		catch (Exception e) {
+			Gdx.app.error("NETWORK_MANAGER","Error while parsing package.");
+			Gdx.app.error("NETWORK_MANAGER", e.toString());
+		}
+		
+		
 	}
 	
 	private byte[] intToByte(int value) {

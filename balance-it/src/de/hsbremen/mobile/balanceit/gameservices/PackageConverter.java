@@ -12,26 +12,27 @@ import com.badlogic.gdx.utils.Array;
 public abstract class PackageConverter {
 
 	private static final String TAG = "PackageConverter";
+	private static final int MATRIX4_BYTE_LENGTH = 64;
 	
 	/**
 	 * Packs the current ground and sphere transformation into a world update.
-	 * 
+	 * Only contains the payload, i.e. not the WORLD_UPDATE Header.
 	 * Protocol:
-	 * WORLD_UPDATE Header (1 Byte)
+	 * WORLD_UPDATE Header (1 Byte) (excluded)
 	 * SPHERE_MATRIX Header (1 Byte)
-	 * Sphere Matrix (12 Byte)
+	 * Sphere Matrix (64 Byte)
 	 * GROUND_ROTATION Header (1 Byte)
-	 * Ground Rotation (12 Byte)
+	 * Ground Rotation (64 Byte)
 	 */
-	public static byte[] getWorldUpdatePackage(Matrix4 sphereTransform, Matrix4 groundRotation) {
+	public static byte[] getWorldUpdatePackagePayload(Matrix4 sphereTransform, Matrix4 groundRotation) {
 		byte[] sphere = ByteConverter.toByte(sphereTransform);
 		byte[] ground = ByteConverter.toByte(groundRotation);
 		
-		//3 Header + Payload
-		int capacity = 3 + sphere.length + ground.length;
+		//2 Header + Payload
+		int capacity = 2 + sphere.length + ground.length;
 		ByteBuffer buffer = ByteBuffer.allocate(capacity);
 		
-		buffer.put(Header.WORLD_UPDATE.getByteValue());
+		//buffer.put(Header.WORLD_UPDATE.getByteValue());
 		buffer.put(Header.SPHERE_MATRIX.getByteValue());
 		buffer.put(sphere);
 		buffer.put(Header.GROUND_ROTATION.getByteValue());
@@ -45,24 +46,25 @@ public abstract class PackageConverter {
 	 * @param worldUpdate The complete world update.
 	 * @return List of packages, i.e. 1. SPHERE_MATRIX - Matrix4 2. GROUND_ROTATION - Matrix4
 	 */
-	public static List<byte[]> getPackages(byte[] worldUpdate) {
-		List<byte[]> packages = new ArrayList<byte[]>();
+	public static List<DataPackage> getPackages(DataPackage worldUpdate) {
+		List<DataPackage> packages = new ArrayList<DataPackage>();
 		
-		Header header = Header.fromValue(worldUpdate[0]);
+		Header header = worldUpdate.getHeader();
 		
-		if (Header.fromValue(worldUpdate[0]).equals(Header.WORLD_UPDATE)) {
-			int matrix4Length = new Matrix4().getValues().length * 4; //TODO: Constant
-			//ByteBuffer buffer = ByteBuffer.wrap(worldUpdate, 1, matrix4Length + 1); //Header + Matrix4
-			int firstPkgLimit = matrix4Length + 2; //Matrix4 + 2 Headers (zero based)
-			byte[] pkg = Arrays.copyOfRange(worldUpdate, 1, firstPkgLimit);
+		if (header.equals(Header.WORLD_UPDATE)) {
+			int firstPkgLimit = MATRIX4_BYTE_LENGTH + 1; //Matrix4 + 1 Header (zero based)
+			byte[] payload = Arrays.copyOfRange(worldUpdate.getPayload(), 1, firstPkgLimit); //exclude the header
 			
-			packages.add(pkg); //Sphere package
+			//Sphere package
+			DataPackage pkg = new DataPackage(Header.SPHERE_MATRIX, worldUpdate.getTimestamp(), 0, 0, payload);
+			packages.add(pkg); 
 			
 			//buffer = ByteBuffer.wrap(worldUpdate, 2 + matrix4Length, matrix4Length + 1); 
 			
-			int secondPkgLimit = firstPkgLimit + 1 + matrix4Length; //first limit + 1 Header + 1 Matrix
+			int secondPkgLimit = firstPkgLimit + 1 + MATRIX4_BYTE_LENGTH; //first limit + 1 Header + 1 Matrix
 			
-			pkg = Arrays.copyOfRange(worldUpdate,  firstPkgLimit, secondPkgLimit);
+			payload = Arrays.copyOfRange(worldUpdate.getPayload(),  firstPkgLimit + 1, secondPkgLimit); //exclude the header
+			pkg = new DataPackage(Header.GROUND_ROTATION, worldUpdate.getTimestamp(), 0, 0, payload);
 			packages.add(pkg);
 		}
 		

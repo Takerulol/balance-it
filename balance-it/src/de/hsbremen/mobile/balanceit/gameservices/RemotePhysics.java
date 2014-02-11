@@ -46,14 +46,14 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 	
 
 	@Override
-	public void onMessageReceived(byte[] data) {
+	public void onPackageReceived(DataPackage data) {
 		//set the sphere transform according to the package
-		Header header = Header.fromValue(data[0]);
+		Header header = data.getHeader();
 		
 		//Gdx.app.log(TAG, "Message received with Header " + header.toString());
 		
 		if (header.equals(Header.SPHERE_MATRIX)) {
-			sphereTransform = ByteConverter.toMatrix4(data, 1);
+			sphereTransform = ByteConverter.toMatrix4(data.getPayload(), 0);
 		}
 	}
 

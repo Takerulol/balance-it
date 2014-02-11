@@ -78,5 +78,12 @@ public class Timer {
         }
 	}
 	
+	/**
+	 * Returns the local time.
+	 */
+	public float getLocalTime() {
+		return localTime;
+	}
+	
 	
 }
