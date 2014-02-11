@@ -35,6 +35,9 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 	@Override
 	public void applyForceToSphere(Vector3 force) {
 		//send current force, if update is required
+		
+		updateTimer += Gdx.graphics.getDeltaTime();
+		
 		if (updateTimer >= SendPhysicsProxy.UPDATE_INTERVAL) {
 			byte[] payload = ByteConverter.toByte(force);
 			this.networkManager.sendPackage(Header.FORCE_VECTOR, payload);
