@@ -8,17 +8,20 @@ import com.badlogic.gdx.Gdx;
 /**
  * This class splits the messages received in smaller packages.
  * Important for world updates, that contain more than one package.
+ * In addition the class keeps track of sequence numbers, calculates latency, and adds timestamps to the packages.
  *
  */
 public class NetworkManagerProxy implements NetworkManager, NetworkManager.Listener {
 
 	private NetworkManager instance;
 	private List<Listener> listener;
+	private Timer timer;
 	
-	public NetworkManagerProxy(NetworkManager instance) {
+	public NetworkManagerProxy(NetworkManager instance, Timer timer) {
 		this.instance = instance;
 		this.listener = new ArrayList<Listener>();
 		this.instance.registerListener(this);
+		this.timer = timer;
 	}
 	
 	@Override

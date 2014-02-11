@@ -33,6 +33,7 @@ import com.badlogic.gdx.Input.Peripheral;
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManagerProxy;
+import de.hsbremen.mobile.balanceit.gameservices.Timer;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
 import de.hsbremen.mobile.balanceit.view.GameView;
@@ -52,6 +53,8 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	private static final boolean INCREASE_DIFFICULTY = false;
 	
 	private boolean createView = false;
+	
+	private Timer timer; 
 	
 	public BaseGame() {
 		this.gameService = null;
@@ -74,10 +77,11 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		
 		Bullet.init();
 		PlayerRole role = PlayerRole.SinglePlayer;
+		this.timer = new Timer();
 		
 		
 		this.menuView = new MenuView(this);
-		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager);
+		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer);
 
         
         if(this.gameService != null) {
@@ -141,7 +145,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	}
 	
 	public void setNetworkManager(NetworkManager manager) {
-		NetworkManager proxy = new NetworkManagerProxy(manager);
+		NetworkManager proxy = new NetworkManagerProxy(manager, timer);
 		this.networkManager = proxy;
 	}
 }

@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
+import de.hsbremen.mobile.balanceit.gameservices.Timer;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.GestureForceManager;
 import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
@@ -57,14 +58,17 @@ public class GameView extends View {
 
 	private GroundRotation groundRotation;
 	
+	private Timer timer;
+	
 	
 	public GameView(Listener listener, ForceManager forceManager, InputProcessor input,
-			Physics physics, GroundRotation rotation) {
+			Physics physics, GroundRotation rotation, Timer timer) {
 		this.listener = listener;
 		this.forceManager = forceManager;
 		this.inputProcessor = input;
 		this.physics = physics;
 		this.groundRotation = rotation;
+		this.timer = timer;
 	}
 	
 	
@@ -179,7 +183,7 @@ public class GameView extends View {
 
 	@Override
 	public void renderObjects() {
-		
+		timer.update(Gdx.graphics.getDeltaTime());
 		camController.update();
 		//Gdx.app.log("balance-it", cam.position.toString());
 		rotateModel(instance);
