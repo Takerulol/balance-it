@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import de.hsbremen.mobile.balanceit.gameservices.ByteConverter;
+import de.hsbremen.mobile.balanceit.gameservices.DataPackage;
 import de.hsbremen.mobile.balanceit.gameservices.Header;
 import de.hsbremen.mobile.balanceit.gameservices.PackageConverter;
 
@@ -63,6 +64,21 @@ public class ByteConverterTest {
 		
 		assertEqualMatrices(ground, ByteConverter.toMatrix4(pkg, 1));
 		
+	}
+	
+	@Test
+	public void testPackage() {
+		byte[] payload = new byte[] { (byte) 5, (byte) 6};
+		DataPackage pkg = new DataPackage(Header.GROUND_ROTATION, 4.3f, 2, 3, payload);
+		
+		DataPackage reconstructedPackage = DataPackage.fromByte(pkg.toByte());
+		
+		assertEquals(pkg.getHeader(), reconstructedPackage.getHeader());
+		assertEquals(pkg.getTimestamp(), reconstructedPackage.getTimestamp(), 0.001f);
+		assertEquals(pkg.getSequenceNumber(), reconstructedPackage.getSequenceNumber());
+		assertEquals(pkg.getLastReceivedSequenceNumber(), reconstructedPackage.getLastReceivedSequenceNumber());
+		
+		assertArrayEquals(pkg.getPayload(), reconstructedPackage.getPayload());
 	}
 	
 	

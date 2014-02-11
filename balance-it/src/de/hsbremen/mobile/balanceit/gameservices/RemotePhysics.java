@@ -14,7 +14,7 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	private NetworkManager networkManager;
 	private Matrix4 sphereTransform;
-	private Vector3 lastForce = Vector3.Zero;
+	private Vector3 lastForce = new Vector3();
 	
 	private static final String TAG = "RemotePhysics";
 
