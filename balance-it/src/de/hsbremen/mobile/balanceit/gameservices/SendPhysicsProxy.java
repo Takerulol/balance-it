@@ -19,7 +19,7 @@ public class SendPhysicsProxy extends PhysicsBaseDecorator {
 	 * Update interval in seconds.
 	 * The class will send a world update to the client in these intervals.
 	 */
-	public static final float UPDATE_INTERVAL = 0.05f;
+	public static final float UPDATE_INTERVAL = 0.1f;
 	private float updateTimer = 0.0f;
 	
 	public SendPhysicsProxy(Physics instance, GroundRotation rotation, NetworkManager networkManager) {

@@ -20,6 +20,10 @@ public class Interpolation {
 	 */
 	private SortedMap<Float, Matrix4> transformationList;
 	
+	private Matrix4 matrixA, matrixB;
+	private float timestampA = 0.0f;
+	private float timestampB = 0.0f;
+	
 	public Interpolation(Timer timer) {
 		this.timer = timer;
 		this.transformationList = new TreeMap<Float, Matrix4>();
@@ -34,38 +38,53 @@ public class Interpolation {
 	 * Should there be no matrices left to interpolate, a null value will be returned.
 	 * @return
 	 */
-	public synchronized Matrix4 getInterpolatedMatrix() {
+	public Matrix4 getInterpolatedMatrix() {
 		Matrix4 result = null;
-		log();
+		//log();
+		
+		//update matrices if required
+		if (matrixA == null) {
+			updateMatrices();
+		} else {
+			//only update, if the timestamp from matrixB is not in the future anymore
+			if (timestampB < timer.getRenderTime()) {
+				updateMatrices();
+			}
+		}
+		
+		if (matrixA != null)
+		{
+			if (matrixB != null) {
+				result = interpolateMatrix4(matrixA, timestampA, matrixB, timestampB);
+			} else {
+				result = matrixA;
+			}
+		}	
+		
+		return result;
+	}
+	
+	private synchronized void updateMatrices() {
 		//check which matrix is the starting point
 		SortedMap<Float, Matrix4> sublist = transformationList.headMap(timer.getRenderTime());
 		if (sublist.size() > 0) {
 			
-			float timestampA = sublist.lastKey();
-			Matrix4 matrixA = transformationList.get(timestampA);
+			timestampA = sublist.lastKey();
+			matrixA = transformationList.get(timestampA);
+			matrixB = null;
 			
 			//check which matrix is the endpoint
 			sublist = transformationList.tailMap(timer.getRenderTime());
 			
 			if (sublist.size() > 0) {
-				
-				float timestampB = sublist.firstKey();
-				Matrix4 matrixB = sublist.get(timestampB);
-				
-				result = interpolateMatrix4(matrixA, timestampA, matrixB, timestampB);
-				
-			} else {
-				result = matrixA;
-			}
+				timestampB = sublist.firstKey();
+				matrixB = sublist.get(timestampB);
+			} 
 			
 			//delete all matrices before A
 			transformationList.headMap(timestampA).clear();
 			
 		}
-		
-		
-		
-		return result;
 	}
 	
 	/**
@@ -83,7 +102,7 @@ public class Interpolation {
 			
 			float alpha = (timer.getRenderTime() - timeAtMatrixA) / (timeAtMatrixB - timeAtMatrixA);
 			result = matrixA.lerp(matrixB, alpha);
-			
+			log(alpha);
 		}
 		
 		return result;
@@ -91,12 +110,15 @@ public class Interpolation {
 	
 	private float logTimer = 0;
 	
-	private void log() {
+	private void log(float alpha) {
 		
 		if (logTimer < timer.getLocalTime()) {
 			String tag = "INTERPOLATION";
 			Gdx.app.log(tag, "----------------------------------------");
 			Gdx.app.log(tag, "Render Time: " + timer.getRenderTime());
+			Gdx.app.log(tag, "Timestamp A: " + timestampA);
+			Gdx.app.log(tag, "Timestamp B: " + timestampB);
+			Gdx.app.log(tag, "Alpha: " + alpha);
 			
 			int i = 0;
 			for (Float timestamp : this.transformationList.keySet()) {
