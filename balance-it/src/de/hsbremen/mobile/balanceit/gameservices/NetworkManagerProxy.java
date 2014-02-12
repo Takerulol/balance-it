@@ -90,9 +90,17 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 		return this.listener;
 	}
 
+	private float offsetUpdateTimer = 0.0f;
+	
 	@Override
 	public void onPackageReceived(DataPackage message) {
 		updateLatency(message);
+		
+		if (offsetUpdateTimer < timer.getLocalTime()) {
+			//update timer
+			this.timer.updateOffset(message.getTimestamp(), latency);
+			offsetUpdateTimer = timer.getLocalTime() + 5.0f;
+		}
 		
 		if (message.getSequenceNumber() > lastReceivedSequenceNumber) {
 			lastReceivedSequenceNumber = message.getSequenceNumber();
@@ -146,8 +154,7 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 			//remove all packages that have a smaller sequence number than the last received number
 			packages.headMap(sequenceNumber).clear();
 			
-			//update timer
-			this.timer.updateOffset(receivedPackage.getTimestamp(), latency);
+			
 		}
 	}
 	
