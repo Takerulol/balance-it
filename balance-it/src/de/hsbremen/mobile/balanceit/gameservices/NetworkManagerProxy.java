@@ -145,6 +145,9 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 			
 			//remove all packages that have a smaller sequence number than the last received number
 			packages.headMap(sequenceNumber).clear();
+			
+			//update timer
+			this.timer.updateOffset(receivedPackage.getTimestamp(), latency);
 		}
 	}
 	

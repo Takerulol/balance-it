@@ -14,14 +14,16 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	private NetworkManager networkManager;
 	private Matrix4 sphereTransform;
+	private Interpolation interpolation;
 	
 	private static final String TAG = "RemotePhysics";
 	
 	private float updateTimer = 0.0f;
 
-	public RemotePhysics(NetworkManager manager) {
+	public RemotePhysics(NetworkManager manager, Timer timer) {
 		this.networkManager = manager;
 		this.networkManager.registerListener(this);
+		this.interpolation = new Interpolation(timer);
 		
 		sphereTransform = new Matrix4();
 	}
@@ -54,7 +56,8 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 		//Gdx.app.log(TAG, "Message received with Header " + header.toString());
 		
 		if (header.equals(Header.SPHERE_MATRIX)) {
-			sphereTransform = ByteConverter.toMatrix4(data.getPayload(), 0);
+			Matrix4 transformation = ByteConverter.toMatrix4(data.getPayload(), 0);
+			interpolation.addMatrix(data.getTimestamp(), transformation);
 		}
 	}
 
@@ -84,7 +87,12 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	@Override
 	public void update(float deltaTime) {
-		//ignore
+		Matrix4 interpolated = interpolation.getInterpolatedMatrix();
+		
+		//if there is nothing to interpolate, keep the old position
+		if (interpolated != null) {
+			sphereTransform = interpolated;
+		}
 	}
 	
 	@Override

@@ -49,7 +49,7 @@ public class GameViewFactory {
 			case ForceApplier:
 				manager = new GestureForceManager(); 
 				gestureDetector = new GestureDetector(manager);
-				Physics applierPhysics = new RemotePhysics(networkManager);
+				Physics applierPhysics = new RemotePhysics(networkManager, timer);
 				rotation = new RemoteGroundRotation(networkManager);
 				view = new GameView(listener, manager, gestureDetector, applierPhysics, rotation, timer);
 				break;
