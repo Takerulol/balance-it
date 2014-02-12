@@ -11,15 +11,23 @@ public class RemoteGroundRotation implements GroundRotation, NetworkManager.List
 
 	private Matrix4 currentRotation;
 	private NetworkManager networkManager;
+	private Interpolation interpolation;
 	
-	public RemoteGroundRotation(NetworkManager networkManager) {
+	public RemoteGroundRotation(NetworkManager networkManager, Timer timer) {
 		this.networkManager = networkManager;
 		this.networkManager.registerListener(this);
 		this.currentRotation = new Matrix4();
+		this.interpolation = new Interpolation(timer);
 	}
 	
 	@Override
 	public Matrix4 getRotation() {
+		Matrix4 interpolated = this.interpolation.getInterpolatedMatrix();
+		
+		if (interpolated != null) {
+			currentRotation = interpolated;
+		}
+		
 		return currentRotation;
 	}
 
@@ -29,6 +37,7 @@ public class RemoteGroundRotation implements GroundRotation, NetworkManager.List
 		
 		if (header.equals(Header.GROUND_ROTATION)) {
 			currentRotation = ByteConverter.toMatrix4(data.getPayload(), 0);
+			this.interpolation.addMatrix(data.getTimestamp(), currentRotation);
 		}
 	}
 

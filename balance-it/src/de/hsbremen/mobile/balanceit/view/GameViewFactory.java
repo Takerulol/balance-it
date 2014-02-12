@@ -50,7 +50,7 @@ public class GameViewFactory {
 				manager = new GestureForceManager(); 
 				gestureDetector = new GestureDetector(manager);
 				Physics applierPhysics = new RemotePhysics(networkManager, timer);
-				rotation = new RemoteGroundRotation(networkManager);
+				rotation = new RemoteGroundRotation(networkManager, timer);
 				view = new GameView(listener, manager, gestureDetector, applierPhysics, rotation, timer);
 				break;
 				
