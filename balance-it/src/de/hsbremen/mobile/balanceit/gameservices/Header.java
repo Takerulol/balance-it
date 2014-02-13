@@ -28,7 +28,12 @@ public enum Header
 	/**
 	 * Payload: see SendPhysicsProxy
 	 */
-	WORLD_UPDATE((byte)3);
+	WORLD_UPDATE((byte)3),
+	
+	/**
+	 * Payload: The new role
+	 */
+	CHANGE_ROLE((byte)4);
 	
 	private byte value;
 	

@@ -1,5 +1,6 @@
 package de.hsbremen.mobile.balanceit.gameservices;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 
@@ -20,6 +21,7 @@ public class RoleChanger implements NetworkManager.Listener {
 	private GameView gameView;
 	private RoleChangerListener listener;
 	private NetworkManager manager;
+	private static final String TAG = "RoleChanger";
 	
 	public RoleChanger(PlayerRole currentRole, GameView gameView,
 			RoleChangerListener listener, NetworkManager manager) {
@@ -57,9 +59,20 @@ public class RoleChanger implements NetworkManager.Listener {
 				
 				switch (this.currentRole) {
 				case SinglePlayer:
+					Gdx.app.log(TAG, "Changing role to SinglePlayer");
 					this.listener.onChangeRole(PlayerRole.SinglePlayer);
 					break;
-					default:
+				
+				case Balancer:
+				//send a package to the other player to change the role then change role
+					Gdx.app.log(TAG, "Changing role to ForceApplier. Sending Package.");
+					byte[] payload = { PlayerRole.Balancer.getByteValue() };
+					this.manager.sendPackage(Header.CHANGE_ROLE, payload);
+					this.listener.onChangeRole(PlayerRole.ForceApplier);
+					break;
+					
+				case ForceApplier:
+					//do nothing
 					break;
 				}
 				
@@ -108,7 +121,18 @@ public class RoleChanger implements NetworkManager.Listener {
 
 	@Override
 	public void onPackageReceived(DataPackage data) {
-		// TODO Auto-generated method stub
+		
+		if (data.getHeader().equals(Header.CHANGE_ROLE)) {
+			//change role to the corresponding role
+			
+			Gdx.app.log(TAG, "Changing role according to Package.");
+			
+			PlayerRole role = PlayerRole.fromValue(data.getPayload()[0]);
+			
+			Gdx.app.log(TAG, "Package role: " + role.toString());
+			
+			this.listener.onChangeRole(role);
+		}
 		
 	}
 	
