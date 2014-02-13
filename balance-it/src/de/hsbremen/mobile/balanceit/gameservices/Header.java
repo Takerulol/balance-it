@@ -33,7 +33,12 @@ public enum Header
 	/**
 	 * Payload: The new role
 	 */
-	CHANGE_ROLE((byte)4);
+	CHANGE_ROLE((byte)4),
+	
+	/**
+	 * No payload.
+	 */
+	READY((byte)5);
 	
 	private byte value;
 	

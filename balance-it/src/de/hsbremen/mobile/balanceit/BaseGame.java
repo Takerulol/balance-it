@@ -40,11 +40,13 @@ import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
 import de.hsbremen.mobile.balanceit.view.GameView;
 import de.hsbremen.mobile.balanceit.view.GameViewFactory;
+import de.hsbremen.mobile.balanceit.view.GetReadyView;
+import de.hsbremen.mobile.balanceit.view.GetReadyView.GetReadyViewListener;
 import de.hsbremen.mobile.balanceit.view.MenuView;
 import de.hsbremen.mobile.balanceit.view.View;
 
 public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener, 
-GameService.Listener, RoleChangerListener {
+GameService.Listener, RoleChangerListener, GetReadyViewListener {
 	
 	View menuView;
 	GameView gameView;
@@ -138,7 +140,10 @@ GameService.Listener, RoleChangerListener {
 		this.roleChanger.setCurrentRole(role);
 		this.roleChanger.setGameView(this.gameView);
 		this.roleChanger.setManager(networkManager);
-		changeView(this.gameView);
+		
+		//display ready screen
+		GetReadyView readyView = new GetReadyView(role, networkManager, this);
+		changeView(readyView);
 	}
 	
 	@Override
@@ -172,5 +177,10 @@ GameService.Listener, RoleChangerListener {
 	public void onEndGame() {
 		// TODO Implement score screen
 		
+	}
+
+	@Override
+	public void onReady() {
+		changeView(this.gameView);
 	}
 }
