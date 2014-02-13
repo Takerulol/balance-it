@@ -25,7 +25,7 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 		this.networkManager.registerListener(this);
 		this.interpolation = new Interpolation(timer);
 		
-		sphereTransform = new Matrix4();
+		sphereTransform = null;
 	}
 	
 	

@@ -46,7 +46,7 @@ public class GameView extends View {
 	public static final float SPHERE_HEIGHT = 1.5f;
 	public static final float GROUND_HEIGHT = 1.0f;
 	public static final float GROUND_WIDTH = 20f;
-	private static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
+	public static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
 	public static final float MIN_BALL_Y_POSITION = -GROUND_WIDTH * 1.5f; //balls will get reseted when falling below this value
 	
 	private PerspectiveCamera cam;
@@ -209,7 +209,11 @@ public class GameView extends View {
 		logForce(Gdx.graphics.getDeltaTime());
 		
 		physics.update(Gdx.graphics.getDeltaTime());
-		instance2.transform = physics.getSphereTransform();
+		
+		Matrix4 physicsSphereTransform = physics.getSphereTransform();
+		
+		if (physicsSphereTransform != null) //shows the sphere at the default position at the beginning
+			instance2.transform = physicsSphereTransform;
 		
 		cam.update();
 		
