@@ -38,7 +38,13 @@ public enum Header
 	/**
 	 * No payload.
 	 */
-	READY((byte)5);
+	READY((byte)5),
+	
+	/**
+	 * No payload.
+	 * Is used for synchronizing packages during the ready screen.
+	 */
+	WAITING((byte)6);
 	
 	private byte value;
 	
