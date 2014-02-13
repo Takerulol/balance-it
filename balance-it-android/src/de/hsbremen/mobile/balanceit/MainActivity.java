@@ -186,7 +186,7 @@ public class MainActivity extends AndroidApplication
 	@Override
 	public void invitePlayers() {
 		if (isLoggedIn()) {
-			Intent intent = this.gameHelper.getGamesClient().getSelectPlayersIntent(2, 2);
+			Intent intent = this.gameHelper.getGamesClient().getSelectPlayersIntent(1, 1);
 			startActivityForResult(intent, RC_SELECT_PLAYERS);
         } else {
         	Log.d(TAG, "InvitePlayers Error: Not logged in.");
