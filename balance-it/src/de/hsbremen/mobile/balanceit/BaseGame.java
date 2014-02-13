@@ -56,7 +56,7 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener {
 	
 	private final GameService gameService;
 	private NetworkManager networkManager = null;
-	private static final boolean INCREASE_DIFFICULTY = false;
+	private static final boolean INCREASE_DIFFICULTY = true;
 	private RoleChanger roleChanger;
 	
 	private boolean changeView = false;
