@@ -33,6 +33,8 @@ import com.badlogic.gdx.Input.Peripheral;
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManagerProxy;
+import de.hsbremen.mobile.balanceit.gameservices.RoleChanger;
+import de.hsbremen.mobile.balanceit.gameservices.RoleChanger.RoleChangerListener;
 import de.hsbremen.mobile.balanceit.gameservices.Timer;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
@@ -41,16 +43,18 @@ import de.hsbremen.mobile.balanceit.view.GameViewFactory;
 import de.hsbremen.mobile.balanceit.view.MenuView;
 import de.hsbremen.mobile.balanceit.view.View;
 
-public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener, GameService.Listener {
+public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener, 
+GameService.Listener, RoleChangerListener {
 	
 	View menuView;
-	View gameView;
+	GameView gameView;
 	
 	View currentView;
 	
 	private final GameService gameService;
 	private NetworkManager networkManager = null;
 	private static final boolean INCREASE_DIFFICULTY = false;
+	private RoleChanger roleChanger;
 	
 	private boolean createView = false;
 	
@@ -83,6 +87,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		this.menuView = new MenuView(this);
 		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer);
 
+		this.roleChanger = new RoleChanger(role, this.gameView, this, this.networkManager);
         
         if(this.gameService != null) {
         	this.menuView.setGameService(this.gameService);
@@ -105,6 +110,7 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 			this.createView = false;
 		}
 		this.currentView.render();
+		this.roleChanger.update();
 	}
 
 	@Override
@@ -122,6 +128,9 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	@Override
 	public void startGame(PlayerRole role) {
 		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer);
+		this.roleChanger.setCurrentRole(role);
+		this.roleChanger.setGameView(this.gameView);
+		this.roleChanger.setManager(networkManager);
 		changeView(this.gameView);
 	}
 	
@@ -147,5 +156,16 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 	public void setNetworkManager(NetworkManager manager) {
 		NetworkManager proxy = new NetworkManagerProxy(manager, timer);
 		this.networkManager = proxy;
+	}
+
+	@Override
+	public void onChangeRole(PlayerRole role) {
+		startGame(role);
+	}
+
+	@Override
+	public void onEndGame() {
+		// TODO Implement score screen
+		
 	}
 }

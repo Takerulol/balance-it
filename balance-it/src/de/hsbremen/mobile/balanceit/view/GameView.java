@@ -41,7 +41,7 @@ public class GameView extends View {
 	public static final float GROUND_HEIGHT = 1.0f;
 	public static final float GROUND_WIDTH = 20f;
 	private static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
-	private static final float MIN_BALL_Y_POSITION = -GROUND_WIDTH * 1.5f; //balls will get reseted when falling below this value
+	public static final float MIN_BALL_Y_POSITION = -GROUND_WIDTH * 1.5f; //balls will get reseted when falling below this value
 	
 	private PerspectiveCamera cam;
 	private Model model;
@@ -165,16 +165,7 @@ public class GameView extends View {
 		model.transform.set(rotation); 
 	}
 	
-	private void checkSpherePosition(ModelInstance sphere) {
-		Vector3 position = new Vector3();
-		sphere.transform.getTranslation(position);
-		if (position.y < MIN_BALL_Y_POSITION) {
-			//reset ball
-			sphere.transform.setTranslation(SPHERE_INITIAL_POSITION);
-			sphere.calculateTransforms();
-			physics.resetSphere(sphere.transform);
-		}
-	}
+	
 	
 	private void applyForce() {
 		Vector3 force = forceManager.getForceVector();
@@ -196,7 +187,6 @@ public class GameView extends View {
 		
 		physics.update(Gdx.graphics.getDeltaTime());
 		instance2.transform = physics.getSphereTransform();
-		checkSpherePosition(instance2);
 		
 		modelBatch.begin(cam);
 		modelBatch.render(instance,environment);
@@ -228,6 +218,10 @@ public class GameView extends View {
 			Gdx.app.log("GameView", "Current force: " + forceManager.getForceVector().toString());
 			logTimer = 0;
 		}
+	}
+	
+	public ModelInstance getSphere() {
+		return this.instance2;
 	}
 
 }
