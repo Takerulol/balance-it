@@ -24,9 +24,14 @@ public class Timer {
 	
 	/**
 	 * Time in seconds in which the offset will be set to the currentOffset.
-	 * This is to prevent the render time to change everytime a package is received. 
+	 * This is to prevent the render time to change every time a package is received. 
 	 */
 	private static final float OFFSET_UPDATE_INTERVAL = 2.0f;
+	
+	/**
+	 * Percentage of the newly calculated offset that will be taken into account for the new offset.
+	 */
+	private static final float OFFSET_UPDATE_PERCENTAGE = 0.1f;
 	
 	/**
 	 * This offset will be calculated every time a package is received.
@@ -97,7 +102,7 @@ public class Timer {
         }
         else
         {
-        	currentOffset = currentOffset * 0.95f + newOffset * 0.05f; //only use 5% of new time to prevent huge jumps
+        	currentOffset = currentOffset * (1 - OFFSET_UPDATE_PERCENTAGE) + newOffset * OFFSET_UPDATE_PERCENTAGE; //use just a percentage to prevent huge jumps
         }
 	}
 	
