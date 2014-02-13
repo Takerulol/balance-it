@@ -50,13 +50,14 @@ GameService.Listener, RoleChangerListener {
 	GameView gameView;
 	
 	View currentView;
+	View nextView;
 	
 	private final GameService gameService;
 	private NetworkManager networkManager = null;
 	private static final boolean INCREASE_DIFFICULTY = false;
 	private RoleChanger roleChanger;
 	
-	private boolean createView = false;
+	private boolean changeView = false;
 	
 	private Timer timer; 
 	
@@ -105,9 +106,15 @@ GameService.Listener, RoleChangerListener {
 
 	@Override
 	public void render() {
-		if (this.createView) {
+		if (this.changeView) {
+			
+			if (this.currentView != null) {
+				this.currentView.dispose();
+			}
+			
+			this.currentView = this.nextView;
 			this.currentView.create();
-			this.createView = false;
+			this.changeView = false;
 		}
 		this.currentView.render();
 		this.roleChanger.update();
@@ -140,10 +147,8 @@ GameService.Listener, RoleChangerListener {
 	}
 
 	private void changeView(View view) {
-		if(this.currentView != null )
-				this.currentView.dispose();
-		this.currentView = view;
-		this.createView = true;
+		this.nextView = view;
+		this.changeView = true;
 	}
 
 	@Override

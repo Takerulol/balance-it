@@ -110,7 +110,7 @@ public class Interpolation {
 	
 	private float logTimer = 0;
 	
-	private void log(float alpha) {
+	private synchronized void log(float alpha) {
 		
 		if (logTimer < timer.getLocalTime()) {
 			String tag = "INTERPOLATION";
