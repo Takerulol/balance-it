@@ -90,17 +90,12 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 		return this.listener;
 	}
 
-	private float offsetUpdateTimer = 0.0f;
 	
 	@Override
 	public void onPackageReceived(DataPackage message) {
+		//update latency and offset
 		updateLatency(message);
-		
-		if (offsetUpdateTimer < timer.getLocalTime()) {
-			//update timer
-			this.timer.updateOffset(message.getTimestamp(), latency);
-			offsetUpdateTimer = timer.getLocalTime() + 5.0f;
-		}
+		this.timer.updateOffset(message.getTimestamp(), latency);
 		
 		if (message.getSequenceNumber() > lastReceivedSequenceNumber) {
 			lastReceivedSequenceNumber = message.getSequenceNumber();
