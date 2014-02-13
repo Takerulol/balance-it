@@ -206,12 +206,7 @@ public class MainActivity extends AndroidApplication
 
 	@Override
 	public void onStartMultiplayerGame(boolean firstPlayer) {
-		PlayerRole role;
-		
-		if (firstPlayer) 
-			role = PlayerRole.Balancer;
-		else 
-			role = PlayerRole.ForceApplier;
+		PlayerRole role = determinePlayerRole();
 		
 		Log.d(TAG, "Starting multiplayer game as role " + role);
 		
@@ -225,6 +220,17 @@ public class MainActivity extends AndroidApplication
 			listener.startMultiplayerGame(role, manager);
 		}
 	}
+	
+	private PlayerRole determinePlayerRole() {
+		PlayerRole role;
+		
+		if (roomManager.isFirstPlayer()) 
+			role = PlayerRole.Balancer;
+		else 
+			role = PlayerRole.ForceApplier;
+		
+		return role;
+	}
 
 	@Override
 	public void showInvitations() {
@@ -234,5 +240,11 @@ public class MainActivity extends AndroidApplication
         } else {
         	Log.d(TAG, "ShowInvitations error: Not logged in.");
         }
+	}
+
+	@Override
+	public void quickGame() {
+		Log.d(TAG, "Attempting to start a quick game.");
+		this.roomManager.startQuickGame();
 	}
 }

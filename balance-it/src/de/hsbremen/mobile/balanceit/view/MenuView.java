@@ -170,10 +170,19 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
+		TextButton quickGameButton = new TextButton("Quick Game", skin);
+		quickGameButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				gameService.quickGame();				
+			}
+		});
+		
 		this.loggedInMenu.add(logoutButton);
 		this.loggedInMenu.add(achievementsButton);
 		this.loggedInMenu.add(invitePlayersButton);
 		this.loggedInMenu.add(showInvitationsButton);
+		this.loggedInMenu.add(quickGameButton);
 		
 		
 		//not logged in

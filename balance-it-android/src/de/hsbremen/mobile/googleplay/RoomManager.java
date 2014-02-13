@@ -75,7 +75,7 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	 * @param host Determines whether or not the local player is the host.
 	 */
 	private void notifyListener() {
-		boolean firstPlayer = isFirstPlayer(mRoom);
+		boolean firstPlayer = isFirstPlayer();
 		for (Listener lis : listenerList) {
 			lis.onStartMultiplayerGame(firstPlayer);
 		}
@@ -86,11 +86,11 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	 * In order to do this, the random playerids are getting compared.
 	 * In addition, the participantId gets set.
 	 */
-	private boolean isFirstPlayer(Room room) {
-		String localId = room.getParticipantId(gamesClient.getCurrentPlayerId());
+	public boolean isFirstPlayer() {
+		String localId = mRoom.getParticipantId(gamesClient.getCurrentPlayerId());
 		String remoteId = null;
 
-		ArrayList<String> ids = room.getParticipantIds();
+		ArrayList<String> ids = mRoom.getParticipantIds();
 		for(int i=0; i<ids.size(); i++)
 		{
 		    String test = ids.get(i);
@@ -344,7 +344,7 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	    gamesClient.createRoom(roomConfig);
 
 	    // prevent screen from sleeping during handshake
-	    activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	    //activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 	    //notifyListener();
 	}
