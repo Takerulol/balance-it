@@ -27,6 +27,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
+import de.hsbremen.mobile.balanceit.gameservices.Timer;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.GestureForceManager;
 import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
@@ -46,7 +47,7 @@ public class GameView extends View {
 	public static final float GROUND_HEIGHT = 1.0f;
 	public static final float GROUND_WIDTH = 20f;
 	private static final Vector3 SPHERE_INITIAL_POSITION = new Vector3(0,10,0);
-	private static final float MIN_BALL_Y_POSITION = -GROUND_WIDTH * 1.5f; //balls will get reseted when falling below this value
+	public static final float MIN_BALL_Y_POSITION = -GROUND_WIDTH * 1.5f; //balls will get reseted when falling below this value
 	
 	private PerspectiveCamera cam;
 	private Model model;
@@ -66,14 +67,17 @@ public class GameView extends View {
 
 	private GroundRotation groundRotation;
 	
+	private Timer timer;
+	
 	
 	public GameView(Listener listener, ForceManager forceManager, InputProcessor input,
-			Physics physics, GroundRotation rotation) {
+			Physics physics, GroundRotation rotation, Timer timer) {
 		this.listener = listener;
 		this.forceManager = forceManager;
 		this.inputProcessor = input;
 		this.physics = physics;
 		this.groundRotation = rotation;
+		this.timer = timer;
 	}
 	
 	
@@ -182,16 +186,7 @@ public class GameView extends View {
 		model.transform.set(rotation); 
 	}
 	
-	private void checkSpherePosition(ModelInstance sphere) {
-		Vector3 position = new Vector3();
-		sphere.transform.getTranslation(position);
-		if (position.y < MIN_BALL_Y_POSITION) {
-			//reset ball
-			sphere.transform.setTranslation(SPHERE_INITIAL_POSITION);
-			sphere.calculateTransforms();
-			physics.resetSphere(sphere.transform);
-		}
-	}
+	
 	
 	private void applyForce() {
 		Vector3 force = forceManager.getForceVector();
@@ -201,6 +196,7 @@ public class GameView extends View {
 	@Override
 	public void renderObjects() {
 		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+		timer.update(Gdx.graphics.getDeltaTime());
 		camController.update();
 		
 		//Gdx.app.log("balance-it", cam.position.toString());
@@ -214,7 +210,6 @@ public class GameView extends View {
 		
 		physics.update(Gdx.graphics.getDeltaTime());
 		instance2.transform = physics.getSphereTransform();
-		checkSpherePosition(instance2);
 		
 		cam.update();
 		
@@ -253,6 +248,10 @@ public class GameView extends View {
 			Gdx.app.log("GameView", "Current force: " + forceManager.getForceVector().toString());
 			logTimer = 0;
 		}
+	}
+	
+	public ModelInstance getSphere() {
+		return this.instance2;
 	}
 
 }

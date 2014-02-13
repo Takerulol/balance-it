@@ -19,7 +19,7 @@ public class SendPhysicsProxy extends PhysicsBaseDecorator {
 	 * Update interval in seconds.
 	 * The class will send a world update to the client in these intervals.
 	 */
-	private static final float UPDATE_INTERVAL = 0.05f;
+	public static final float UPDATE_INTERVAL = 0.1f;
 	private float updateTimer = 0.0f;
 	
 	public SendPhysicsProxy(Physics instance, GroundRotation rotation, NetworkManager networkManager) {
@@ -35,38 +35,10 @@ public class SendPhysicsProxy extends PhysicsBaseDecorator {
 		
 		if (updateTimer >= UPDATE_INTERVAL) {
 			//send a world update
-			byte[] updateMessage = getWorldUpdatePackage();
-			this.networkManager.sendPackage(updateMessage);
+			byte[] updateMessage = PackageConverter.getWorldUpdatePackagePayload(
+					super.getSphereTransform(), groundRotation.getRotation());
+			this.networkManager.sendPackage(Header.WORLD_UPDATE, updateMessage);
 			updateTimer = 0.0f;
 		}
 	}
-	
-	/**
-	 * Packs the current ground and sphere transformation into a world update.
-	 * 
-	 * Protocol:
-	 * WORLD_UPDATE Header (1 Byte)
-	 * SPHERE_MATRIX Header (1 Byte)
-	 * Sphere Matrix (12 Byte)
-	 * GROUND_ROTATION Header (1 Byte)
-	 * Ground Rotation (12 Byte)
-	 */
-	private byte[] getWorldUpdatePackage() {
-		byte[] sphere = ByteConverter.toByte(super.getSphereTransform());
-		byte[] ground = ByteConverter.toByte(groundRotation.getRotation());
-		
-		//3 Header + Payload
-		int capacity = 3 + sphere.length + ground.length;
-		ByteBuffer buffer = ByteBuffer.allocate(capacity);
-		
-		buffer.put(Header.WORLD_UPDATE.getByteValue());
-		buffer.put(Header.SPHERE_MATRIX.getByteValue());
-		buffer.put(sphere);
-		buffer.put(Header.GROUND_ROTATION.getByteValue());
-		buffer.put(ground);
-		
-		return buffer.array();
-	}
-	
-	
 }

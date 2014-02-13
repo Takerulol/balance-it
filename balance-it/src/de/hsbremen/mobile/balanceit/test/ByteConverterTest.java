@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import de.hsbremen.mobile.balanceit.gameservices.ByteConverter;
+import de.hsbremen.mobile.balanceit.gameservices.DataPackage;
 import de.hsbremen.mobile.balanceit.gameservices.Header;
 import de.hsbremen.mobile.balanceit.gameservices.PackageConverter;
 
@@ -40,13 +41,15 @@ public class ByteConverterTest {
 		Matrix4 sphere = new Matrix4(new Quaternion(1,2,3,4));
 		Matrix4 ground = new Matrix4();
 		
-		byte[] update = PackageConverter.getWorldUpdatePackage(sphere, ground);
-		List<byte[]> packages = PackageConverter.getPackages(update);
+		byte[] payload = PackageConverter.getWorldUpdatePackagePayload(sphere, ground);
+		float timestamp = 2.5f; 
+		DataPackage dataPackage = new DataPackage(Header.WORLD_UPDATE, timestamp, 0, 0, payload);
+		List<DataPackage> packages = PackageConverter.getPackages(dataPackage);
 		
-		byte[] pkg = packages.get(0);
-		assertEquals(Header.SPHERE_MATRIX, Header.fromValue(pkg[0]));
-		
-		assertEqualMatrices(sphere, ByteConverter.toMatrix4(pkg, 1));
+		DataPackage pkg = packages.get(0);
+		assertEquals(Header.SPHERE_MATRIX, pkg.getHeader());
+		assertEquals(timestamp, pkg.getTimestamp(), 0.001f);
+		assertEqualMatrices(sphere, ByteConverter.toMatrix4(pkg.getPayload(), 0));
 		
 	}
 	
@@ -55,14 +58,35 @@ public class ByteConverterTest {
 		Matrix4 sphere = new Matrix4();
 		Matrix4 ground = new Matrix4(new Quaternion(1,2,3,4));
 		
-		byte[] update = PackageConverter.getWorldUpdatePackage(sphere, ground);
-		List<byte[]> packages = PackageConverter.getPackages(update);
+		byte[] payload = PackageConverter.getWorldUpdatePackagePayload(sphere, ground);
+		float timestamp = 2.5f; 
+		DataPackage dataPackage = new DataPackage(Header.WORLD_UPDATE, timestamp, 0, 0, payload);
+		List<DataPackage> packages = PackageConverter.getPackages(dataPackage);
 		
-		byte[] pkg = packages.get(1);
-		assertEquals(Header.GROUND_ROTATION, Header.fromValue(pkg[0]));
+		DataPackage pkg = packages.get(1);
+		assertEquals(Header.GROUND_ROTATION, pkg.getHeader());
+		assertEquals(timestamp, pkg.getTimestamp(), 0.001f);
+		assertEqualMatrices(ground, ByteConverter.toMatrix4(pkg.getPayload(), 0));
 		
-		assertEqualMatrices(ground, ByteConverter.toMatrix4(pkg, 1));
+	}
+	
+	@Test
+	public void testPackage() {
+		byte[] payload = new byte[] { (byte) 5, (byte) 6};
+		DataPackage pkg = new DataPackage(Header.GROUND_ROTATION, 4.3f, 2, 3, payload);
 		
+		DataPackage reconstructedPackage = DataPackage.fromByte(pkg.toByte());
+		
+		assertEqualsPackages(pkg, reconstructedPackage);
+	}
+	
+	private void assertEqualsPackages(DataPackage expected, DataPackage actual) {
+		assertEquals(expected.getHeader(), actual.getHeader());
+		assertEquals(expected.getTimestamp(), actual.getTimestamp(), 0.001f);
+		assertEquals(expected.getSequenceNumber(), actual.getSequenceNumber());
+		assertEquals(expected.getLastReceivedSequenceNumber(), actual.getLastReceivedSequenceNumber());
+		
+		assertArrayEquals(expected.getPayload(), actual.getPayload());
 	}
 	
 	

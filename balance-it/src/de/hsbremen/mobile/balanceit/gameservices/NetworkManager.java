@@ -4,7 +4,7 @@ package de.hsbremen.mobile.balanceit.gameservices;
 public interface NetworkManager {
 
 	public interface Listener {
-		void onMessageReceived(byte[] data);
+		void onPackageReceived(DataPackage data);
 	}
 	
 	public abstract void registerListener(Listener listener);

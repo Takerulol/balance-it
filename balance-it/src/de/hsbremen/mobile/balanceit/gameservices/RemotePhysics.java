@@ -14,13 +14,16 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	private NetworkManager networkManager;
 	private Matrix4 sphereTransform;
-	private Vector3 lastForce = Vector3.Zero;
+	private Interpolation interpolation;
 	
 	private static final String TAG = "RemotePhysics";
+	
+	private float updateTimer = 0.0f;
 
-	public RemotePhysics(NetworkManager manager) {
+	public RemotePhysics(NetworkManager manager, Timer timer) {
 		this.networkManager = manager;
 		this.networkManager.registerListener(this);
+		this.interpolation = new Interpolation(timer);
 		
 		sphereTransform = new Matrix4();
 	}
@@ -33,27 +36,28 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	@Override
 	public void applyForceToSphere(Vector3 force) {
-		//only send packages, if the force has been altered.
-		if (!lastForce.equals(force)) {
-			
-			Gdx.app.log(TAG, "Sending force: " + force.toString());
-			
+		//send current force, if update is required
+		
+		updateTimer += Gdx.graphics.getDeltaTime();
+		
+		if (updateTimer >= SendPhysicsProxy.UPDATE_INTERVAL) {
 			byte[] payload = ByteConverter.toByte(force);
 			this.networkManager.sendPackage(Header.FORCE_VECTOR, payload);
-			lastForce = force;
+			updateTimer = 0.0f;
 		}
 	}
 	
 
 	@Override
-	public void onMessageReceived(byte[] data) {
+	public void onPackageReceived(DataPackage data) {
 		//set the sphere transform according to the package
-		Header header = Header.fromValue(data[0]);
+		Header header = data.getHeader();
 		
 		//Gdx.app.log(TAG, "Message received with Header " + header.toString());
 		
 		if (header.equals(Header.SPHERE_MATRIX)) {
-			sphereTransform = ByteConverter.toMatrix4(data, 1);
+			Matrix4 transformation = ByteConverter.toMatrix4(data.getPayload(), 0);
+			interpolation.addMatrix(data.getTimestamp(), transformation);
 		}
 	}
 
@@ -83,7 +87,12 @@ public class RemotePhysics implements Physics, NetworkManager.Listener {
 
 	@Override
 	public void update(float deltaTime) {
-		//ignore
+		Matrix4 interpolated = interpolation.getInterpolatedMatrix();
+		
+		//if there is nothing to interpolate, keep the old position
+		if (interpolated != null) {
+			sphereTransform = interpolated;
+		}
 	}
 	
 	@Override

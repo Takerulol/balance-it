@@ -24,15 +24,15 @@ public class RemoteForceManager implements ForceManager, NetworkManager.Listener
 	}
 
 	@Override
-	public void onMessageReceived(byte[] data) {
-		Header header = Header.fromValue(data[0]);
+	public void onPackageReceived(DataPackage data) {
+		Header header = data.getHeader();
 		
 		//Gdx.app.log("RemoteForceManager", "Package received with header " + header.toString());
 		
 		if (header.equals(Header.FORCE_VECTOR)) {
 			//the package contains a force vector
 			//get force vector and set the current force accordingly
-			currentForce = ByteConverter.toVector3(data, 1);
+			currentForce = ByteConverter.toVector3(data.getPayload(), 0);
 			Gdx.app.log("RemoteForceManager", "Current received force: " + currentForce.toString());
 		}
 	}
