@@ -5,7 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -13,9 +16,11 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -27,6 +32,7 @@ import de.hsbremen.mobile.balanceit.logic.GestureForceManager;
 import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
 import de.hsbremen.mobile.balanceit.logic.GroundRotation;
 import de.hsbremen.mobile.balanceit.logic.Physics;
+import de.hsbremen.mobile.balanceit.view.shader.SkyboxShader;
 
 public class GameView extends View {
 	
@@ -52,6 +58,9 @@ public class GameView extends View {
 	private CameraInputController camController; //TODO: delete
 	private ForceManager forceManager;
 	private InputProcessor inputProcessor; 
+	
+	private Skybox skybox;
+	private ShaderProgram skyboxShader;
 	
 	Physics physics;
 
@@ -91,27 +100,38 @@ public class GameView extends View {
 		camController = new CameraInputController(cam);
 		//Gdx.input.setInputProcessor(camController);
 		
-		Gdx.input.setInputProcessor(inputProcessor);
+		Gdx.input.setInputProcessor(camController);
 		
-		
+		Texture texture1 = new Texture(Gdx.files.internal("images/textures/wood.png"));
+		texture1.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		ModelBuilder modelBuilder = new ModelBuilder();
 		model = modelBuilder.createCylinder(20f, GROUND_HEIGHT, GROUND_WIDTH, 32, 
-				new Material(ColorAttribute.createDiffuse(Color.YELLOW)), 
-				Usage.Position | Usage.Normal);
-//		model = modelBuilder.createBox(5f, 5f, 5f, 
-//				new Material(ColorAttribute.createDiffuse(Color.YELLOW)), 
-//				Usage.Position | Usage.Normal);
+				new Material(), 
+				Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+		model.manageDisposable(texture1);
 		instance = new ModelInstance(model);
+		instance.materials.first().set(new TextureAttribute(TextureAttribute.Diffuse, texture1));
 		
 		physics.initGround(instance.transform);
 		
+		Texture texture2 = new Texture(Gdx.files.internal("images/textures/metal.png"));
+		texture2.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		ball = modelBuilder.createSphere(SPHERE_HEIGHT, SPHERE_HEIGHT, SPHERE_HEIGHT, 32, 32, 
-				new Material(ColorAttribute.createDiffuse(Color.RED)),
-				Usage.Position | Usage.Normal);
+				new Material(),
+				Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+		ball.manageDisposable(texture2);
 		
 		instance2 = new ModelInstance(ball, SPHERE_INITIAL_POSITION);
+		instance2.materials.first().set(new TextureAttribute(TextureAttribute.Diffuse, texture2));
 		
 		physics.initSphere(instance2.transform);
+		
+		
+		skyboxShader = new ShaderProgram(SkyboxShader.vertexShader, SkyboxShader.fragmentShader);
+		if(!skyboxShader.isCompiled()) {
+			throw new RuntimeException("skybox shader couldn't compile: " + skyboxShader.getLog());
+		}
+		skybox = new Skybox("sky");
 		
 //		camera = new OrthographicCamera(1, h/w);
 //		batch = new SpriteBatch();
@@ -148,6 +168,7 @@ public class GameView extends View {
 	public void dispose() {
 //		batch.dispose();
 //		texture.dispose();
+		skybox.dispose();
 		model.dispose();
 		modelBatch.dispose();
 		physics.dispose();
@@ -179,8 +200,9 @@ public class GameView extends View {
 
 	@Override
 	public void renderObjects() {
-		
+		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
 		camController.update();
+		
 		//Gdx.app.log("balance-it", cam.position.toString());
 		rotateModel(instance);
 		
@@ -193,6 +215,13 @@ public class GameView extends View {
 		physics.update(Gdx.graphics.getDeltaTime());
 		instance2.transform = physics.getSphereTransform();
 		checkSpherePosition(instance2);
+		
+		cam.update();
+		
+		//Rendering
+		skyboxShader.begin();
+		skybox.render(skyboxShader, cam);
+		skyboxShader.end();
 		
 		modelBatch.begin(cam);
 		modelBatch.render(instance,environment);

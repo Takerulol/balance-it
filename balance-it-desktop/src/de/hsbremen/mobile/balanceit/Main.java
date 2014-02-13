@@ -8,8 +8,9 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "balance-it";
 		cfg.useGL20 = true;
-		cfg.width = 480;
-		cfg.height = 320;
+		cfg.width = 1280;
+		cfg.height = 720;
+		cfg.samples = 4;
 		
 		new LwjglApplication(new BaseGame(), cfg);
 	}
