@@ -247,4 +247,12 @@ public class MainActivity extends AndroidApplication
 		Log.d(TAG, "Attempting to start a quick game.");
 		this.roomManager.startQuickGame();
 	}
+
+	@Override
+	public void onCancelGame() {
+		for (Listener tempListener : this.listener) {
+			tempListener.cancelMultiplayerGame();
+		}
+		
+	}
 }

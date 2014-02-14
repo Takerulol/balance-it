@@ -20,4 +20,5 @@ public abstract class View implements ApplicationListener, GameServiceClient {
 	 * Autocleared rendering
 	 */
 	public abstract void renderObjects();
+	
 }

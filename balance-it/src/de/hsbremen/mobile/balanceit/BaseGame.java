@@ -26,8 +26,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.Input.Peripheral;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
@@ -48,7 +50,7 @@ import de.hsbremen.mobile.balanceit.view.View;
 public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener, 
 GameService.Listener, RoleChangerListener, GetReadyViewListener {
 	
-	View menuView;
+	MenuView menuView;
 	GameView gameView;
 	
 	View currentView;
@@ -182,5 +184,11 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener {
 	@Override
 	public void onReady() {
 		changeView(this.gameView);
+	}
+
+	@Override
+	public void cancelMultiplayerGame() {
+		this.changeView(this.menuView);
+		this.menuView.showDisconnectedDialog();
 	}
 }

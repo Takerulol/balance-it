@@ -34,6 +34,11 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 
 	public interface Listener {
 		void onStartMultiplayerGame(boolean firstPlayer);
+		
+		/**
+		 * Event occurs, if the current game should be canceled, because there are not enough players present.
+		 */
+		void onCancelGame();
 	}
 	
 	// arbitrary request code for the waiting room UI.
@@ -106,21 +111,22 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	
 	// returns whether there are enough players to start the game
 	boolean shouldStartGame(Room room) {
-	    int connectedPlayers = 0;
-	    for (Participant p : room.getParticipants()) {
+	    int connectedPlayers = getConnectedPlayersCount(room);
+	    return connectedPlayers >= REQUIRED_PLAYERS;
+	}
+	
+	int getConnectedPlayersCount(Room room) {
+		int connectedPlayers = 0;
+		for (Participant p : room.getParticipants()) {
 	        if (p.isConnectedToRoom()) ++connectedPlayers;
 	    }
-	    return connectedPlayers >= REQUIRED_PLAYERS;
+		return connectedPlayers;
 	}
 
 	// Returns whether the room is in a state where the game should be cancelled.
 	boolean shouldCancelGame(Room room) {
-	    // TODO: Your game-specific cancellation logic here. For example, you might decide to 
-	    // cancel the game if enough people have declined the invitation or left the room.
-	    // You can check a participant's status with Participant.getStatus().
-	    // (Also, your UI should have a Cancel button that cancels the game too)
-		
-		return false;
+	   int connectedPlayers = getConnectedPlayersCount(room);
+	   return connectedPlayers < REQUIRED_PLAYERS;
 	}
 
 	@Override
@@ -145,8 +151,7 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	    }
 	    else if (shouldCancelGame(room)) {
 	        // cancel the game
-	        gamesClient.leaveRoom(this, room.getRoomId());
-	        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	    	cancelGame(room);
 	    }
 	}
 
@@ -154,8 +159,7 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	public void onPeerLeft(Room room, List<String> peers) {
 	    // peer left -- see if game should be cancelled
 	    if (!mPlaying && shouldCancelGame(room)) {
-	        gamesClient.leaveRoom(this, room.getRoomId());
-	        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	    	cancelGame(room);
 	    }
 	}
 
@@ -163,9 +167,17 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	public void onPeerDeclined(Room room, List<String> peers) {
 	    // peer declined invitation -- see if game should be cancelled
 	    if (!mPlaying && shouldCancelGame(room)) {
-	    	gamesClient.leaveRoom(this, room.getRoomId());
-	        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	    	cancelGame(room);
 	    }
+	}
+	
+	private void cancelGame(Room room) {
+		gamesClient.leaveRoom(this, room.getRoomId());
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        
+        for (Listener listener : this.listenerList) {
+        	listener.onCancelGame();
+        }
 	}
 
 	

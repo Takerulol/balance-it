@@ -11,6 +11,7 @@ public interface GameService {
 		 * @param manager The NetworkManager used for multiplayer communication during the game.
 		 */
 		void startMultiplayerGame(PlayerRole role, NetworkManager manager);
+		void cancelMultiplayerGame();
 	}
 	
 	void addListener(Listener listener);
