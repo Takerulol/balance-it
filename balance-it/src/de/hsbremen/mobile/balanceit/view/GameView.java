@@ -120,10 +120,10 @@ public class GameView extends View {
 		cam.far = 300f;
 		cam.update();
 			
-		camController = new CameraInputController(cam);
+//		camController = new CameraInputController(cam);
 		//Gdx.input.setInputProcessor(camController);
 		
-		Gdx.input.setInputProcessor(camController);
+		Gdx.input.setInputProcessor(inputProcessor);
 		
 		Texture texture1 = new Texture(Gdx.files.internal("images/textures/wood.png"),true);
 		texture1.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
