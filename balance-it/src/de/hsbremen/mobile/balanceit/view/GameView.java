@@ -120,9 +120,8 @@ public class GameView extends View {
 		cam.far = 300f;
 		cam.update();
 			
-//		camController = new CameraInputController(cam);
+		camController = new CameraInputController(cam);
 		//Gdx.input.setInputProcessor(camController);
-		
 		Gdx.input.setInputProcessor(inputProcessor);
 		
 		Texture texture1 = new Texture(Gdx.files.internal("images/textures/wood.png"),true);
@@ -246,7 +245,8 @@ public class GameView extends View {
 		interfaceBatch.begin();
 		float ratio = (float)Gdx.graphics.getWidth() / 800f;
 		font.setScale(ratio * 1f);
-		renderCenteredText("Time : " , -0.45f);
+		//TODO: enter time
+		renderCenteredText("Time :     "+ Math.round(timer.getRenderTime() * 100f) / 100f , -0.45f, font.getBounds("Time :     0.00"));
 		font.setScale(1f);
 		interfaceBatch.end();
 	}
@@ -282,6 +282,10 @@ public class GameView extends View {
 	
 	private void renderCenteredText(String text, float yDisplace) {
 		TextBounds bounds = font.getBounds(text);
+		font.draw(interfaceBatch, text, 0.5f * Gdx.graphics.getWidth() - bounds.width / 2f, 0.5f * Gdx.graphics.getHeight() + bounds.height / 2f - yDisplace * Gdx.graphics.getHeight());
+	}
+	
+	private void renderCenteredText(String text, float yDisplace, TextBounds bounds) {
 		font.draw(interfaceBatch, text, 0.5f * Gdx.graphics.getWidth() - bounds.width / 2f, 0.5f * Gdx.graphics.getHeight() + bounds.height / 2f - yDisplace * Gdx.graphics.getHeight());
 	}
 
