@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -210,6 +211,14 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
+		TextButton quickGameButton = new TextButton("Quick Game", skin);
+		quickGameButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				gameService.quickGame();				
+			}
+		});
+		
 		this.loggedInMenu.add(logoutButton);
 		this.loggedInMenu.row();
 		this.loggedInMenu.add(achievementsButton);
@@ -218,6 +227,7 @@ public class MenuView extends View implements GameServiceClient {
 		this.loggedInMenu.row();
 		this.loggedInMenu.add(showInvitationsButton);
 		this.loggedInMenu.row();
+		this.loggedInMenu.add(quickGameButton);
 		
 		
 		//not logged in
@@ -243,6 +253,21 @@ public class MenuView extends View implements GameServiceClient {
 			this.gameServiceMenu.add(this.loggedOutMenu);
 		}
 		
+	}
+
+	public void showDisconnectedDialog() {
+		
+		Gdx.app.postRunnable(new Runnable() {
+	         @Override
+	         public void run() {
+	        	 new Dialog("Game canceled.", skin) {
+	     			{
+	     				text("The oppenent disconnected.");
+	     				button("OK");
+	     			}
+	     		}.show(stage);
+	         }
+		});
 	}
 	
 }

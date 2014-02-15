@@ -26,8 +26,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.Input.Peripheral;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
@@ -49,7 +51,7 @@ import de.hsbremen.mobile.balanceit.view.View;
 public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener, 
 GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listener {
 	
-	View menuView;
+	MenuView menuView;
 	GameView gameView;
 	HelpView helpView;
 	
@@ -58,7 +60,7 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 	
 	private final GameService gameService;
 	private NetworkManager networkManager = null;
-	private static final boolean INCREASE_DIFFICULTY = false;
+	private static final boolean INCREASE_DIFFICULTY = true;
 	private RoleChanger roleChanger;
 	
 	private boolean changeView = false;
@@ -200,5 +202,12 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 	@Override
 	public void viewHelp() {
 		changeView(this.helpView);
+	}	
+
+	@Override
+	public void cancelMultiplayerGame() {
+		this.changeView(this.menuView);
+		this.menuView.showDisconnectedDialog();
+
 	}
 }
