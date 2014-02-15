@@ -15,6 +15,10 @@ public class Interpolation {
 	
 	private Timer timer;
 	
+	private float renderTime = 0.0f;
+
+	private static final String tag = "INTERPOLATION";
+	
 	/**
 	 * The map contains the received transformation matrices and their timestamp.
 	 */
@@ -40,6 +44,7 @@ public class Interpolation {
 	 */
 	public Matrix4 getInterpolatedMatrix() {
 		Matrix4 result = null;
+		renderTime = timer.getRenderTime();
 		//log();
 		
 		//update matrices if required
@@ -47,7 +52,7 @@ public class Interpolation {
 			updateMatrices();
 		} else {
 			//only update, if the timestamp from matrixB is not in the future anymore
-			if (timestampB < timer.getRenderTime()) {
+			if (timestampB < renderTime) {
 				updateMatrices();
 			}
 		}
@@ -58,6 +63,7 @@ public class Interpolation {
 				result = interpolateMatrix4(matrixA, timestampA, matrixB, timestampB);
 			} else {
 				result = matrixA;
+				Gdx.app.log(tag, "No matrixB found (RenderTime: " + renderTime);
 			}
 		}	
 		
@@ -66,7 +72,7 @@ public class Interpolation {
 	
 	private synchronized void updateMatrices() {
 		//check which matrix is the starting point
-		SortedMap<Float, Matrix4> sublist = transformationList.headMap(timer.getRenderTime());
+		SortedMap<Float, Matrix4> sublist = transformationList.headMap(renderTime);
 		if (sublist.size() > 0) {
 			
 			timestampA = sublist.lastKey();
@@ -74,7 +80,7 @@ public class Interpolation {
 			matrixB = null;
 			
 			//check which matrix is the endpoint
-			sublist = transformationList.tailMap(timer.getRenderTime());
+			sublist = transformationList.tailMap(renderTime);
 			
 			if (sublist.size() > 0) {
 				timestampB = sublist.firstKey();
@@ -100,7 +106,7 @@ public class Interpolation {
 		
 		if (timeAtMatrixA < timeAtMatrixB) {
 			
-			float alpha = (timer.getRenderTime() - timeAtMatrixA) / (timeAtMatrixB - timeAtMatrixA);
+			float alpha = (renderTime - timeAtMatrixA) / (timeAtMatrixB - timeAtMatrixA);
 			result = matrixA.lerp(matrixB, alpha);
 			log(alpha);
 		}
@@ -113,9 +119,8 @@ public class Interpolation {
 	private synchronized void log(float alpha) {
 		
 		if (logTimer < timer.getLocalTime()) {
-			String tag = "INTERPOLATION";
 			Gdx.app.log(tag, "----------------------------------------");
-			Gdx.app.log(tag, "Render Time: " + timer.getRenderTime());
+			Gdx.app.log(tag, "Render Time: " + renderTime);
 			Gdx.app.log(tag, "Timestamp A: " + timestampA);
 			Gdx.app.log(tag, "Timestamp B: " + timestampB);
 			Gdx.app.log(tag, "Alpha: " + alpha);
@@ -129,6 +134,14 @@ public class Interpolation {
 			logTimer = timer.getLocalTime() + 5.0f;
 		}
 		
+	}
+	
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
 	}
 	
 	

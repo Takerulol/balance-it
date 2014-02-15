@@ -3,12 +3,12 @@ package de.hsbremen.mobile.balanceit.view;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import de.hsbremen.mobile.balanceit.gameservices.Timer;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.gameservices.RemoteForceManager;
 import de.hsbremen.mobile.balanceit.gameservices.RemoteGroundRotation;
 import de.hsbremen.mobile.balanceit.gameservices.RemotePhysics;
 import de.hsbremen.mobile.balanceit.gameservices.SendPhysicsProxy;
-import de.hsbremen.mobile.balanceit.gameservices.Timer;
 import de.hsbremen.mobile.balanceit.logic.BulletPhysics;
 import de.hsbremen.mobile.balanceit.logic.ForceDifficultyManager;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;

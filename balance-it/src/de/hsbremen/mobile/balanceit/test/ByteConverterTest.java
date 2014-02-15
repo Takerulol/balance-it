@@ -91,11 +91,13 @@ public class ByteConverterTest {
 	
 	
 	
-	private void assertEqualMatrices(Matrix4 matrix1, Matrix4 matrix2) {
+	public static void assertEqualMatrices(Matrix4 matrix1, Matrix4 matrix2) {
+		assertEqualMatrices(matrix1, matrix2, 0.001f);
+	}
+	
+	public static void assertEqualMatrices(Matrix4 matrix1, Matrix4 matrix2, float epsilon) {
 		float[] values1 = matrix1.getValues();
 		float[] values2 = matrix2.getValues();
-		
-		float epsilon = 0.001f;
 		
 		assertTrue(values1.length == values2.length);
 		

@@ -33,11 +33,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.Input.Peripheral;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
+import de.hsbremen.mobile.balanceit.gameservices.Timer;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManagerProxy;
 import de.hsbremen.mobile.balanceit.gameservices.RoleChanger;
 import de.hsbremen.mobile.balanceit.gameservices.RoleChanger.RoleChangerListener;
-import de.hsbremen.mobile.balanceit.gameservices.Timer;
+import de.hsbremen.mobile.balanceit.gameservices.TimerImpl;
 import de.hsbremen.mobile.balanceit.logic.ForceManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
 import de.hsbremen.mobile.balanceit.view.GameView;
@@ -91,7 +92,7 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 		
 		Bullet.init();
 		PlayerRole role = PlayerRole.SinglePlayer;
-		this.timer = new Timer();
+		this.timer = new TimerImpl();
 		
 		
 		this.menuView = new MenuView(this, this.skin);

@@ -184,6 +184,7 @@ public class GameView extends View {
 		model.dispose();
 		modelBatch.dispose();
 		physics.dispose();
+		timer.reset();
 	}
 	
 	/**
