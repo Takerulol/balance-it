@@ -211,7 +211,7 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
-		TextButton quickGameButton = new TextButton("Quick Game", skin);
+		TextButton quickGameButton = new TextButton("Quick Game", getSkin());
 		quickGameButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -260,7 +260,7 @@ public class MenuView extends View implements GameServiceClient {
 		Gdx.app.postRunnable(new Runnable() {
 	         @Override
 	         public void run() {
-	        	 new Dialog("Game canceled.", skin) {
+	        	 new Dialog("Game canceled.", getSkin()) {
 	     			{
 	     				text("The oppenent disconnected.");
 	     				button("OK");
