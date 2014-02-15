@@ -42,14 +42,16 @@ import de.hsbremen.mobile.balanceit.view.GameView;
 import de.hsbremen.mobile.balanceit.view.GameViewFactory;
 import de.hsbremen.mobile.balanceit.view.GetReadyView;
 import de.hsbremen.mobile.balanceit.view.GetReadyView.GetReadyViewListener;
+import de.hsbremen.mobile.balanceit.view.HelpView;
 import de.hsbremen.mobile.balanceit.view.MenuView;
 import de.hsbremen.mobile.balanceit.view.View;
 
 public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener, 
-GameService.Listener, RoleChangerListener, GetReadyViewListener {
+GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listener {
 	
 	View menuView;
 	GameView gameView;
+	HelpView helpView;
 	
 	View currentView;
 	View nextView;
@@ -62,6 +64,8 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener {
 	private boolean changeView = false;
 	
 	private Timer timer; 
+	
+	private Skin skin;
 	
 	public BaseGame() {
 		this.gameService = null;
@@ -81,14 +85,16 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener {
 			//TODO: Throw error and terminate game
 		}
 		
+		this.skin = new Skin(Gdx.files.internal("data/uiskin.json"));
 		
 		Bullet.init();
 		PlayerRole role = PlayerRole.SinglePlayer;
 		this.timer = new Timer();
 		
 		
-		this.menuView = new MenuView(this);
-		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer);
+		this.menuView = new MenuView(this, this.skin);
+		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer, skin);
+		this.helpView = new HelpView(this, this.skin);
 
 		this.roleChanger = new RoleChanger(role, this.gameView, this, this.networkManager);
         
@@ -124,6 +130,8 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener {
 
 	@Override
 	public void resize(int width, int height) {
+		if(this.currentView != null)
+			this.currentView.resize(width, height);
 	}
 
 	@Override
@@ -136,19 +144,19 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener {
 
 	@Override
 	public void startGame(PlayerRole role) {
-		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer);
+		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer, skin);
 		this.roleChanger.setCurrentRole(role);
 		this.roleChanger.setGameView(this.gameView);
 		this.roleChanger.setManager(networkManager);
 		
 		//display ready screen
-		GetReadyView readyView = new GetReadyView(role, networkManager, this);
+		GetReadyView readyView = new GetReadyView(role, networkManager, this, skin);
 		changeView(readyView);
 	}
 	
 	@Override
 	public void switchToMenu() {
-		//TODO: implement me	
+		changeView(this.menuView);
 	}
 
 	private void changeView(View view) {
@@ -182,5 +190,15 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener {
 	@Override
 	public void onReady() {
 		changeView(this.gameView);
+	}
+
+	@Override
+	public void switchBack() {
+		switchToMenu();
+	}
+
+	@Override
+	public void viewHelp() {
+		changeView(this.helpView);
 	}
 }

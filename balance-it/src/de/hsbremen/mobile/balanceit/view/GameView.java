@@ -10,6 +10,9 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -18,13 +21,16 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.Timer;
@@ -63,21 +69,28 @@ public class GameView extends View {
 	private Skybox skybox;
 	private ShaderProgram skyboxShader;
 	
+	private DirectionalShadowLight shadowLight;
+	private ModelBatch shadowBatch;
+	
+	private SpriteBatch interfaceBatch;
+	private BitmapFont font;
+	
 	Physics physics;
 
 	private GroundRotation groundRotation;
 	
 	private Timer timer;
-	
+
 	
 	public GameView(Listener listener, ForceManager forceManager, InputProcessor input,
-			Physics physics, GroundRotation rotation, Timer timer) {
+			Physics physics, GroundRotation rotation, Timer timer, Skin skin) {
 		this.listener = listener;
 		this.forceManager = forceManager;
 		this.inputProcessor = input;
 		this.physics = physics;
 		this.groundRotation = rotation;
 		this.timer = timer;
+		setSkin(skin);
 	}
 	
 	
@@ -87,7 +100,13 @@ public class GameView extends View {
 		
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight,0.4f,0.4f,0.4f,1f));
-		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+//		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		shadowLight = new DirectionalShadowLight(1024, 1024, 30f, 30f, 1f, 100f);
+		shadowLight.set(0.8f, 0.8f, 0.8f, -1f, -.8f, -.2f);
+		environment.add(shadowLight);
+		environment.shadowMap = shadowLight;
+		
+		shadowBatch = new ModelBatch(new DepthShaderProvider());
 		
 		
 		float w = Gdx.graphics.getWidth();
@@ -106,8 +125,8 @@ public class GameView extends View {
 		
 		Gdx.input.setInputProcessor(camController);
 		
-		Texture texture1 = new Texture(Gdx.files.internal("images/textures/wood.png"));
-		texture1.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		Texture texture1 = new Texture(Gdx.files.internal("images/textures/wood.png"),true);
+		texture1.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
 		ModelBuilder modelBuilder = new ModelBuilder();
 		model = modelBuilder.createCylinder(20f, GROUND_HEIGHT, GROUND_WIDTH, 32, 
 				new Material(), 
@@ -118,8 +137,8 @@ public class GameView extends View {
 		
 		physics.initGround(instance.transform);
 		
-		Texture texture2 = new Texture(Gdx.files.internal("images/textures/metal.png"));
-		texture2.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		Texture texture2 = new Texture(Gdx.files.internal("images/textures/metal.png"),true);
+		texture2.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
 		ball = modelBuilder.createSphere(SPHERE_HEIGHT, SPHERE_HEIGHT, SPHERE_HEIGHT, 32, 32, 
 				new Material(),
 				Usage.Position | Usage.Normal | Usage.TextureCoordinates);
@@ -137,22 +156,13 @@ public class GameView extends View {
 		}
 		skybox = new Skybox("sky");
 		
-//		camera = new OrthographicCamera(1, h/w);
-//		batch = new SpriteBatch();
-//		
-//		texture = new Texture(Gdx.files.internal("data/libgdx.png"));
-//		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-//		
-//		TextureRegion region = new TextureRegion(texture, 0, 0, 512, 275);
-//		
-//		sprite = new Sprite(region);
-//		sprite.setSize(0.9f, 0.9f * sprite.getHeight() / sprite.getWidth());
-//		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
-//		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
+		font = getSkin().getFont("default-font");
+		interfaceBatch = new SpriteBatch();
 	}
 
 	@Override
 	public void resize(int width, int height) {
+		//stage.setViewport(800, 480, false);
 	}
 
 	@Override
@@ -161,7 +171,6 @@ public class GameView extends View {
 	}
 
 	private void reset() {
-		// TODO IMPLEMENT ME
 	}
 
 	@Override
@@ -222,15 +231,24 @@ public class GameView extends View {
 		skybox.render(skyboxShader, cam);
 		skyboxShader.end();
 		
+		shadowLight.begin(Vector3.Zero,cam.direction);
+		shadowBatch.begin(shadowLight.getCamera());
+		shadowBatch.render(instance2);
+		shadowBatch.render(instance);
+		shadowBatch.end();
+		shadowLight.end();
+		
 		modelBatch.begin(cam);
 		modelBatch.render(instance,environment);
 		modelBatch.render(instance2,environment);
 		modelBatch.end();
 		
-//		batch.setProjectionMatrix(camera.combined);
-//		batch.begin();
-//		sprite.draw(batch);
-//		batch.end();
+		interfaceBatch.begin();
+		float ratio = (float)Gdx.graphics.getWidth() / 800f;
+		font.setScale(ratio * 1f);
+		renderCenteredText("Time : " , -0.45f);
+		font.setScale(1f);
+		interfaceBatch.end();
 	}
 
 	@Override
@@ -256,6 +274,15 @@ public class GameView extends View {
 	
 	public ModelInstance getSphere() {
 		return this.instance2;
+	}
+	
+	private void renderCenteredText(String text) {
+		renderCenteredText(text, 0f);
+	}
+	
+	private void renderCenteredText(String text, float yDisplace) {
+		TextBounds bounds = font.getBounds(text);
+		font.draw(interfaceBatch, text, 0.5f * Gdx.graphics.getWidth() - bounds.width / 2f, 0.5f * Gdx.graphics.getHeight() + bounds.height / 2f - yDisplace * Gdx.graphics.getHeight());
 	}
 
 }

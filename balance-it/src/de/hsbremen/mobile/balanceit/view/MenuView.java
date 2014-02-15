@@ -1,12 +1,18 @@
 package de.hsbremen.mobile.balanceit.view;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Scaling;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.GameServiceClient;
@@ -18,11 +24,11 @@ public class MenuView extends View implements GameServiceClient {
 	
 	public static interface Listener {
 		void startGame(PlayerRole role);
+		void viewHelp();
 	}
 	
 	private Listener listener;
 
-	private Skin skin;
 	private Stage stage;
 
 	private Table menuTable;
@@ -31,20 +37,25 @@ public class MenuView extends View implements GameServiceClient {
 	private Table gameServiceMenu = null;
 	private Table loggedInMenu;
 	private Table loggedOutMenu;
+
+	private Sprite logoSprite;
+	private SpriteBatch batch;
 	
-	public MenuView(Listener listener) {
+	public MenuView(Listener listener, Skin skin) {
 		this.listener = listener;
+		setSkin(skin);
 	}
 	
 	@Override
 	public void create() {
 		//default libgdx menu skin
-		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
-		stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),false);
+//		stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),false);
+		stage = new Stage();
+		stage.setViewport(800, 480, false, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.input.setInputProcessor(stage);
 		
 		//start game button
-		TextButton startGameButton = new TextButton("Start Game", skin);
+		TextButton startGameButton = new TextButton("Start Game", getSkin());
 		startGameButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -52,9 +63,18 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
+		//help button
+		TextButton helpButton = new TextButton("Help", getSkin());
+		helpButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				listener.viewHelp();				
+			}
+		});
 		
-		this.menuTable = new Table(skin);
-		this.menuTable.setPosition(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
+		
+		this.menuTable = new Table(getSkin());
+		this.menuTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
 		 
 		if(this.gameService != null) {
 			initializeGameServiceMenu();
@@ -62,14 +82,30 @@ public class MenuView extends View implements GameServiceClient {
 
 		//Add buttons
 		this.menuTable.add(startGameButton);
+		this.menuTable.row();
+		this.menuTable.add(helpButton);
+		this.menuTable.row();
 		
 		this.stage.addActor(this.menuTable);
+		
+		Texture logo = new Texture(Gdx.files.internal("images/textures/logo.png"));
+		logo.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		logoSprite = new Sprite(logo);
+		logoSprite.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		batch = new SpriteBatch();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-		
+		Vector2 size = Scaling.fit.apply(800, 480, width, height);
+        int viewportX = (int)(width - size.x) / 2;
+        int viewportY = (int)(height - size.y) / 2;
+        int viewportWidth = (int)size.x;
+        int viewportHeight = (int)size.y;
+        Gdx.gl.glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+        stage.setViewport(800, 480, true, viewportX, viewportY, viewportWidth, viewportHeight);
+        this.menuTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
 	}
 
 	@Override
@@ -81,6 +117,10 @@ public class MenuView extends View implements GameServiceClient {
 
 	@Override
 	public void renderObjects() {
+		batch.begin();
+		logoSprite.draw(batch);
+		batch.end();
+		
 		this.stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 		checkMenuStatus();
 		this.stage.draw();
@@ -132,13 +172,13 @@ public class MenuView extends View implements GameServiceClient {
 	}
 	
 	private void buildGameServiceMenus() {
-		this.gameServiceMenu = new Table(skin);
+		this.gameServiceMenu = new Table(getSkin());
 		this.menuTable.add(this.gameServiceMenu); //add to main menu
 		
 		//logged in
-		this.loggedInMenu = new Table(skin);
+		this.loggedInMenu = new Table(getSkin());
 		
-		TextButton logoutButton = new TextButton("Logout", skin);
+		TextButton logoutButton = new TextButton("Logout", getSkin());
 		logoutButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -146,7 +186,7 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
-		TextButton achievementsButton = new TextButton("Achievements", skin);
+		TextButton achievementsButton = new TextButton("Achievements", getSkin());
 		achievementsButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -154,7 +194,7 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
-		TextButton invitePlayersButton = new TextButton("Invite Players", skin);
+		TextButton invitePlayersButton = new TextButton("Invite Players", getSkin());
 		invitePlayersButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -162,7 +202,7 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
-		TextButton showInvitationsButton = new TextButton("Show Invitations", skin);
+		TextButton showInvitationsButton = new TextButton("Show Invitations", getSkin());
 		showInvitationsButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -171,15 +211,19 @@ public class MenuView extends View implements GameServiceClient {
 		});
 		
 		this.loggedInMenu.add(logoutButton);
+		this.loggedInMenu.row();
 		this.loggedInMenu.add(achievementsButton);
+		this.loggedInMenu.row();
 		this.loggedInMenu.add(invitePlayersButton);
+		this.loggedInMenu.row();
 		this.loggedInMenu.add(showInvitationsButton);
+		this.loggedInMenu.row();
 		
 		
 		//not logged in
-		this.loggedOutMenu = new Table(skin);
+		this.loggedOutMenu = new Table(getSkin());
 		
-		TextButton loginButton = new TextButton("Login", skin);
+		TextButton loginButton = new TextButton("Login", getSkin());
 		loginButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {

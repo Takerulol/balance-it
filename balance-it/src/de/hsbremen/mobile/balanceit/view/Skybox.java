@@ -4,13 +4,13 @@ import java.nio.IntBuffer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -57,6 +57,7 @@ public class Skybox implements Disposable {
 		
 		pixmaps = new Pixmap[6];
 		
+		//loading textures from drive
 		pixmaps[0] = new Pixmap(Gdx.files.internal("images/skybox/"+skyname+"_pos_x.png"));
 		pixmaps[1] = new Pixmap(Gdx.files.internal("images/skybox/"+skyname+"_neg_x.png"));
 		pixmaps[2] = new Pixmap(Gdx.files.internal("images/skybox/"+skyname+"_pos_y.png"));
@@ -64,6 +65,7 @@ public class Skybox implements Disposable {
 		pixmaps[4] = new Pixmap(Gdx.files.internal("images/skybox/"+skyname+"_pos_z.png"));
 		pixmaps[5] = new Pixmap(Gdx.files.internal("images/skybox/"+skyname+"_neg_z.png"));
 		
+		//create skybox object
 		this.meshes = new Mesh[NB_FACES];
 		for (int i = 0; i < NB_FACES; i++) {
 			Mesh mesh = new Mesh(true, QUAD_LENGTH * 3, QUAD_LENGTH,
@@ -73,19 +75,17 @@ public class Skybox implements Disposable {
 			meshes[i] = mesh;
 		}
 
-		// Generate a texture object
+		// generate texture hook
 		IntBuffer buffer = BufferUtils.newIntBuffer(1);
 		buffer.position(0);
 		buffer.limit(buffer.capacity());
 		Gdx.gl20.glGenTextures(1, buffer);
 		textureId = buffer.get(0);
 
-		// Bind the texture object
+		// bind texture
 		Gdx.gl20.glActiveTexture(SKYBOX_TEXTURE_ACTIVE_UNIT);
 		Gdx.gl20.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, textureId);
 		
-		// Set the filtering mode
-		// cf. http://www.opengl.org/sdk/docs/man/xhtml/glTexParameter.xml
 		Gdx.gl20.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP,
 				GL20.GL_TEXTURE_MIN_FILTER, GL20.GL_NEAREST);
 		Gdx.gl20.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP,
@@ -95,15 +95,17 @@ public class Skybox implements Disposable {
 				GL20.GL_TEXTURE_WRAP_S, GL20.GL_CLAMP_TO_EDGE);
 		Gdx.gl20.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP,
 				GL20.GL_TEXTURE_WRAP_T, GL20.GL_CLAMP_TO_EDGE);
+
+		//missing in gl20
 //		 Gdx.gl20.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, 
 //				GL20.GL_TEXTURE_WRAP_R, GL20.GL_CLAMP_TO_EDGE);
 
-		// Load cube faces
+		// skybox texture loading to graphics (all 6 faces)
 		for (int i = 0; i < 6; i++) {
 			glTexImage2D(GL20.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, pixmaps[i]);
 		}
 		
-		// Create model matrix for rendering
+		// theoretical model position
 		model = new Matrix4();
 
 	}
@@ -115,17 +117,16 @@ public class Skybox implements Disposable {
 		}
 	}
 
+	//TODO: add skybox movement in conjunction to applied force
 	public void render(ShaderProgram shader, Camera camera) {
 
 		Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
-		//Gdx.gl20.glDisable(GL11.GL_LIGHTING);
 
-		// Bind the texture
 		Gdx.gl20.glActiveTexture(SKYBOX_TEXTURE_ACTIVE_UNIT);
 		Gdx.gl20.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, textureId);
 
 		model.setToTranslation(camera.position);
-//		model.rotate(1, 0, 0, 90);
+		model.rotate(1, 0, 0, -90);
 
 		shader.setUniformMatrix("u_M", model);
 		shader.setUniformMatrix("u_VP", camera.combined);
@@ -136,16 +137,13 @@ public class Skybox implements Disposable {
 		}
 
 		Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
-//		Gdx.gl20.glEnable(GL11.GL_LIGHTING);
 	}
 
 	private void glTexImage2D(int textureCubeMapIndex, Pixmap pixmap) {
-		// cf. http://www.opengl.org/sdk/docs/man/xhtml/glTexImage2D.xml
 		Gdx.gl20.glTexImage2D(textureCubeMapIndex, 0,
 				pixmap.getGLInternalFormat(), pixmap.getWidth(),
 				pixmap.getHeight(), 0, pixmap.getGLFormat(),
 				pixmap.getGLType(), pixmap.getPixels());
-		System.out.println(pixmap.getWidth() + " " + pixmap.getHeight());
 	}
 
 	private float[] getVertices(int indexNb) {

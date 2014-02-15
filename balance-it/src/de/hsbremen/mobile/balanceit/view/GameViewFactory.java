@@ -1,6 +1,7 @@
 package de.hsbremen.mobile.balanceit.view;
 
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.gameservices.RemoteForceManager;
@@ -27,11 +28,12 @@ public class GameViewFactory {
 	 * Creates a GameView based on the parameters.
 	 * @param listener The GameView.Listener that should be used.
 	 * @param role The PlayerRole which the GameView will be used for.
+	 * @param skin 
 	 * @param increaseFoce Determines whether or not the GameView should increase the force after some time (does not apply to role ForceApplier).
 	 * @return The created GameView.
 	 */
 	public GameView createGameView(GameView.Listener listener, PlayerRole role, boolean increaseForce, 
-		NetworkManager networkManager, Timer timer) {
+		NetworkManager networkManager, Timer timer, Skin skin) {
 		GameView view = null;
 		GestureForceManager manager = null;
 		GestureDetector gestureDetector = null;
@@ -43,7 +45,7 @@ public class GameViewFactory {
 				ForceManager remoteManager = createForceManager(role, increaseForce, networkManager);
 				Physics balancerPhysics = createBulletPhysics();
 				balancerPhysics = new SendPhysicsProxy(balancerPhysics, rotation, networkManager);
-				view = new GameView(listener, remoteManager, null, balancerPhysics, rotation, timer); //TODO: CameraInput
+				view = new GameView(listener, remoteManager, null, balancerPhysics, rotation, timer, skin); //TODO: CameraInput
 				break;
 				
 			case ForceApplier:
@@ -51,13 +53,13 @@ public class GameViewFactory {
 				gestureDetector = new GestureDetector(manager);
 				Physics applierPhysics = new RemotePhysics(networkManager, timer);
 				rotation = new RemoteGroundRotation(networkManager, timer);
-				view = new GameView(listener, manager, gestureDetector, applierPhysics, rotation, timer);
+				view = new GameView(listener, manager, gestureDetector, applierPhysics, rotation, timer, skin);
 				break;
 				
 			case SinglePlayer:
 				ForceManager randomManager = createForceManager(role, increaseForce, networkManager);
 				Physics singlePlayerPhysics = createBulletPhysics();
-				view = new GameView(listener, randomManager, null, singlePlayerPhysics, rotation, timer); //TODO: CameraInput
+				view = new GameView(listener, randomManager, null, singlePlayerPhysics, rotation, timer, skin); //TODO: CameraInput
 				break;
 				
 		}

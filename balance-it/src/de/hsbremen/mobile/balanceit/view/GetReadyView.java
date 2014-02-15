@@ -1,6 +1,20 @@
 package de.hsbremen.mobile.balanceit.view;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.utils.Scaling;
 
 import de.hsbremen.mobile.balanceit.gameservices.DataPackage;
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
@@ -14,6 +28,12 @@ public class GetReadyView extends View implements NetworkManager.Listener {
 	private NetworkManager networkManager;
 	private PlayerRole role;
 	private GetReadyViewListener listener;
+	
+	private Stage stage;
+	private Table outputTable;
+	private SpriteBatch batch;
+	private BitmapFont font;
+	private Sprite backgroundSprite;
 	
 	/**
 	 * Time after which the player is ready. (Only for balancer and single player)
@@ -29,7 +49,7 @@ public class GetReadyView extends View implements NetworkManager.Listener {
 	}
 	
 	public GetReadyView(PlayerRole role, NetworkManager networkManager,
-			GetReadyViewListener listener) {
+			GetReadyViewListener listener, Skin skin) {
 		this.networkManager = networkManager;
 		this.role = role;
 		
@@ -37,18 +57,71 @@ public class GetReadyView extends View implements NetworkManager.Listener {
 			networkManager.registerListener(this);
 		
 		this.listener = listener;
+		
+		setSkin(skin);
 	}
 	
 	@Override
 	public void create() {
-		// TODO Auto-generated method stub
-
+		stage = new Stage();
+		stage.setViewport(800, 480, false, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		this.outputTable = new Table(getSkin());
+		this.outputTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
+		
+		batch = new SpriteBatch();
+		font = getSkin().getFont("default-font");
+		
+//		Label label = new Label("Sie sind dran!", getSkin());
+//		this.outputTable.add(label);
+		
+//		TextField text = new TextField("Jing gong in da hood ya!", getSkin());
+//		text.setWidth(600);
+//		text.setHeight(100);
+//		this.outputTable.add(text);
+		
+//		Dialog d = new Dialog("Das Match wird gestartet", getSkin(),"dialog").text("Balancieren sie die Kugel!");
+//		this.outputTable.add(d);
+		
+		String playerString;
+		switch (role) {
+		case SinglePlayer:
+			playerString = "Balance the Ball!";
+			break;
+		case Balancer:
+			playerString = "It's your turn to balance!";
+			break;
+		case ForceApplier:
+			playerString = "Disturb the enemy ball!";
+			break;
+		default:
+			playerString = "Balance the Ball!";
+			break;
+		}
+		Window window = new Window(playerString, getSkin());
+		window.add("Get ready! The game is starting soon!");
+		this.outputTable.add(window);
+		
+		stage.addActor(outputTable);
+		
+		Texture background = new Texture(Gdx.files.internal("images/textures/background_start.png"));
+		background.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		backgroundSprite = new Sprite(background);
+		backgroundSprite.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		batch = new SpriteBatch();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
+		Vector2 size = Scaling.fit.apply(800, 480, width, height);
+        int viewportX = (int)(width - size.x) / 2;
+        int viewportY = (int)(height - size.y) / 2;
+        int viewportWidth = (int)size.x;
+        int viewportHeight = (int)size.y;
+        Gdx.gl.glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+        stage.setViewport(800, 480, true, viewportX, viewportY, viewportWidth, viewportHeight);
+        this.outputTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
 	}
 
 	@Override
@@ -90,6 +163,7 @@ public class GetReadyView extends View implements NetworkManager.Listener {
 		}
 	}
 	
+	
 	@Override
 	public void renderObjects() {
 		
@@ -99,6 +173,20 @@ public class GetReadyView extends View implements NetworkManager.Listener {
 			updateTimer();
 		else
 			started = true;
+		
+		batch.begin();
+		backgroundSprite.draw(batch);
+		batch.end();
+		
+		this.stage.draw();
+		
+//		batch.begin();
+//		font.setScale((float)Gdx.graphics.getWidth() / 800f * 2f);
+//		font.draw(batch, "Wurst", Gdx.graphics.getWidth() / 800 * 100, Gdx.graphics.getHeight() / 480 * 100);
+//		font.setScale(2f);
+//		font.draw(batch, "Wurst", Gdx.graphics.getWidth() / 800 * 150, Gdx.graphics.getHeight() / 480 * 150);
+//		font.setScale(1f);
+//		batch.end();
 		
 	}
 	
