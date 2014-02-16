@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
@@ -57,6 +58,8 @@ public class ResultView extends View {
 				listener.backFromResult();				
 			}
 		});
+		backButton.setTransform(true);
+		backButton.scale(.3f);
 		this.stage.addActor(backButton);
 		
 		Texture background = new Texture(Gdx.files.internal("images/textures/background_result.png"));

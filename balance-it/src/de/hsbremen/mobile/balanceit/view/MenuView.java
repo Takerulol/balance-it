@@ -72,10 +72,11 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
-		
 		this.menuTable = new Table(getSkin());
-		this.menuTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
-		 
+		this.menuTable.setTransform(true);
+		this.menuTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f - stage.getHeight() / 10f);
+		this.menuTable.scale(.3f);
+		
 		//Add buttons
 		this.menuTable.add(startGameButton);
 		this.menuTable.row();
@@ -85,7 +86,7 @@ public class MenuView extends View implements GameServiceClient {
 		if(this.gameService != null) {
 			initializeGameServiceMenu();
 		}
-
+		
 		this.stage.addActor(this.menuTable);
 		
 		Texture logo = new Texture(Gdx.files.internal("images/textures/logo.png"));
@@ -105,7 +106,7 @@ public class MenuView extends View implements GameServiceClient {
         int viewportHeight = (int)size.y;
         Gdx.gl.glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
         stage.setViewport(800, 480, true, viewportX, viewportY, viewportWidth, viewportHeight);
-        this.menuTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
+        this.menuTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f - stage.getHeight() / 10f);
 	}
 
 	@Override
@@ -210,15 +211,16 @@ public class MenuView extends View implements GameServiceClient {
 			}
 		});
 		
-		this.loggedInMenu.add(logoutButton);
-		this.loggedInMenu.row();
-		this.loggedInMenu.add(achievementsButton);
-		this.loggedInMenu.row();
+
 		this.loggedInMenu.add(invitePlayersButton);
 		this.loggedInMenu.row();
 		this.loggedInMenu.add(showInvitationsButton);
 		this.loggedInMenu.row();
 		this.loggedInMenu.add(quickGameButton);
+		this.loggedInMenu.row();
+		this.loggedInMenu.add(achievementsButton);
+		this.loggedInMenu.row();
+		this.loggedInMenu.add(logoutButton);
 		
 		
 		//not logged in
