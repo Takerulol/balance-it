@@ -33,4 +33,5 @@ public interface GameService {
 	void quickGame();
 	
 	void disconnectMultiplayer();
+	Achievements getAchievements();
 }
