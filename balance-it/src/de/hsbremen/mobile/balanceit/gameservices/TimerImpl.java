@@ -39,8 +39,6 @@ public class TimerImpl implements Timer {
 	 */
 	private float currentOffset = 0.0f;
 	
-	float currentLatency = 0.0f;
-	
 	/* (non-Javadoc)
 	 * @see de.hsbremen.mobile.balanceit.gameservices.ITimer#getEstimatedServerTime()
 	 */
@@ -54,7 +52,7 @@ public class TimerImpl implements Timer {
 	 */
 	@Override
 	public float getRenderTime() {
-		float renderTime = getEstimatedServerTime() - currentLatency * 0.5f - CLIENT_RENDER_DELAY * SendPhysicsProxy.UPDATE_INTERVAL;
+		float renderTime = getEstimatedServerTime() - CLIENT_RENDER_DELAY * SendPhysicsProxy.UPDATE_INTERVAL;
 		return renderTime;
 	}
 	
@@ -65,7 +63,6 @@ public class TimerImpl implements Timer {
 	public void reset() {
 		localTime = 0.0f;
 		offset = 0.0f;
-		currentLatency = 0.0f;
 		currentOffset = 0.0f;
 	}
 	
@@ -90,12 +87,10 @@ public class TimerImpl implements Timer {
 	 * @see de.hsbremen.mobile.balanceit.gameservices.ITimer#updateOffset(float, float)
 	 */
 	@Override
-	public void updateOffset(float serverTimestamp, float latency) {
-		this.currentLatency = latency;
+	public void updateOffset(float serverTimestamp) {
 
-        float newEstimatedServerTime = serverTimestamp + this.currentLatency * 0.5f;
 
-        float newOffset = newEstimatedServerTime - localTime;
+        float newOffset = serverTimestamp - localTime;
 
         if (offset == 0.0f)
         {

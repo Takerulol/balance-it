@@ -25,11 +25,10 @@ public interface Timer {
 
 	/**
 	 * Updates the offset time relative to the server time.
-	 * Is used, when a sent package got acknowledged by a received package.
+	 * Is used, when a package is received.
 	 * @param serverTimestamp Timestamp of the acknowledging package.
-	 * @param latency Latency of the acknowledging package.
 	 */
-	public abstract void updateOffset(float serverTimestamp, float latency);
+	public abstract void updateOffset(float serverTimestamp);
 
 	/**
 	 * Returns the local time.

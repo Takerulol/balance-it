@@ -25,20 +25,12 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 	private long sequenceNumber = 1;
 	private long lastReceivedSequenceNumber = 0;
 	
-	//current latency in seconds
-	private float latency = 0.0f;
-	
-	/**
-	 * List of packages that have been send. Used for latency calculations.
-	 */
-	private SortedMap<Long, DataPackage> packages;
 	
 	public NetworkManagerProxy(NetworkManager instance, Timer timer) {
 		this.instance = instance;
 		this.listener = new ArrayList<Listener>();
 		this.instance.registerListener(this);
 		this.timer = timer;
-		packages = new TreeMap<Long, DataPackage>();
 	}
 	
 	@Override
@@ -57,7 +49,6 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 	public void sendPackage(Header header, byte[] payload) {
 		DataPackage pkg = createPackage(header, payload);
 		this.instance.sendPackage(pkg.toByte());
-		addPackage(pkg);
 	}
 
 	@Override
@@ -93,9 +84,8 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 	
 	@Override
 	public void onPackageReceived(DataPackage message) {
-		//update latency and offset
-		updateLatency(message);
-		this.timer.updateOffset(message.getTimestamp(), latency);
+
+		this.timer.updateOffset(message.getTimestamp());
 		
 		if (message.getSequenceNumber() > lastReceivedSequenceNumber) {
 			lastReceivedSequenceNumber = message.getSequenceNumber();
@@ -120,40 +110,6 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 		printLatency(); //TODO: Delete
 	}
 	
-	private synchronized void addPackage(DataPackage sentPackage) {
-		packages.put(sentPackage.getSequenceNumber(), sentPackage);
-	}
-	
-	/**
-	 * Updates the latency.
-	 * Synchronized, because the method will get called on a received package. Because of that, 
-	 * multiply threads may enter the method at the same time. Synchronization is needed, because
-	 * the method makes heavy modifications to the package map.
-	 */
-	private synchronized void updateLatency(DataPackage receivedPackage) {
-		//calculate the latency for the current received package
-		long sequenceNumber = receivedPackage.getLastReceivedSequenceNumber();
-		if (packages.containsKey(sequenceNumber)) {
-			DataPackage acknowledgedPackage = packages.get(sequenceNumber);
-			
-			float packageLatency = timer.getLocalTime() - acknowledgedPackage.getTimestamp();
-			if (Math.abs(latency) < 0.00001f) {
-				//first latency
-				latency = packageLatency;
-			}
-			else {
-				//update latency, but take only 10% of the package latency into account
-				latency = latency * 0.9f + packageLatency * 0.1f;
-			}
-			
-			//remove all packages that have a smaller sequence number than the last received number
-			packages.headMap(sequenceNumber).clear();
-			
-			
-		}
-	}
-	
-	
 	//TODO: remove below here
 	
 	private float latencyTimer = 0.0f;
@@ -162,8 +118,6 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 		String TAG = "LATENCY";
 		
 		if (timer.getLocalTime() > latencyTimer) {
-			//Gdx.app.log(TAG, "Latency: " + new DecimalFormat("#.##").format(latency / 1000));
-			Gdx.app.log(TAG, "Latency: " + latency);
 			Gdx.app.log(TAG, "Sequence: " + sequenceNumber);
 			Gdx.app.log(TAG, "Last Received: " + lastReceivedSequenceNumber);
 			Gdx.app.log(TAG, "Local Time: " + timer.getLocalTime());
