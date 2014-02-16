@@ -16,9 +16,11 @@ import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
+import de.hsbremen.mobile.balanceit.gameservices.Achievements;
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
 import de.hsbremen.mobile.balanceit.logic.PlayerRole;
+import de.hsbremen.mobile.googleplay.AchievementsImpl;
 import de.hsbremen.mobile.googleplay.InvitationManager;
 import de.hsbremen.mobile.googleplay.NetworkManagerImpl;
 import de.hsbremen.mobile.googleplay.RoomManager;
@@ -36,6 +38,7 @@ public class MainActivity extends AndroidApplication
 	private RoomManager roomManager;
 
 	private InvitationManager invitationManager;
+	private Achievements achievements;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,8 @@ public class MainActivity extends AndroidApplication
         
         gameHelper = new GameHelper(this);
         gameHelper.enableDebugLog(true, "BIPS");
+        
+        achievements = new AchievementsImpl(gameHelper, getBaseContext());
         
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.useGL20 = true;
@@ -264,5 +269,10 @@ public class MainActivity extends AndroidApplication
 		if (this.roomManager != null)
 			this.roomManager.leaveRoom();
 		
+	}
+
+	@Override
+	public Achievements getAchievements() {
+		return this.achievements;
 	}
 }

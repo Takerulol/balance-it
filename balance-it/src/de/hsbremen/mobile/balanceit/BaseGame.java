@@ -32,6 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.Input.Peripheral;
 
+import de.hsbremen.mobile.balanceit.gameservices.Achievements;
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 import de.hsbremen.mobile.balanceit.gameservices.Timer;
 import de.hsbremen.mobile.balanceit.gameservices.NetworkManager;
@@ -221,6 +222,11 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		Gdx.app.log("BaseGame", "Ending game with time " + myTime);
 		this.roleChanger.reset();
 		
+
+		if (this.gameService != null) {
+			if (this.gameService.getAchievements() != null)
+				this.gameService.getAchievements().unlockSingleplayerTime(myTime);
+		}
 		this.resultView.showSingleplayerEnd(myTime);
 		this.changeView(this.resultView);
 	}
@@ -231,6 +237,12 @@ public class BaseGame implements ApplicationListener, GameView.Listener, MenuVie
 		Gdx.app.log("BaseGame", "MyTime: " + myTime);
 		Gdx.app.log("BaseGame", "EnemyTime: " + enemyTime);
 		this.gameService.disconnectMultiplayer();
+
+		if (myTime > enemyTime && this.gameService != null) {
+			if (this.gameService.getAchievements() != null)
+				this.gameService.getAchievements().unlockMultiplayerWin();
+		}
+		
 		this.resultView.showMultiplayerEnd(myTime,enemyTime);
 		this.changeView(this.resultView);
 	}
