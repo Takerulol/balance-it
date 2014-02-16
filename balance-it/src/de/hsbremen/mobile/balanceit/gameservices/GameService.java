@@ -31,4 +31,6 @@ public interface GameService {
 	void addMultiplayerLoss();
 	void invitePlayers();
 	void quickGame();
+	
+	void disconnectMultiplayer();
 }

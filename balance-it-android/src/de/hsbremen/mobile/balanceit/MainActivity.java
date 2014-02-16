@@ -258,4 +258,11 @@ public class MainActivity extends AndroidApplication
 		}
 		
 	}
+
+	@Override
+	public void disconnectMultiplayer() {
+		if (this.roomManager != null)
+			this.roomManager.leaveRoom();
+		
+	}
 }

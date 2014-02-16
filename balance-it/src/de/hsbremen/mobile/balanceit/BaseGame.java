@@ -224,6 +224,7 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 		Gdx.app.log("BaseGame", "Ending game.");
 		Gdx.app.log("BaseGame", "MyTime: " + myTime);
 		Gdx.app.log("BaseGame", "EnemyTime: " + enemyTime);
+		this.gameService.disconnectMultiplayer();
 		this.changeView(this.menuView);
 	}
 }
