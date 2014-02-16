@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.util.Log;
 
@@ -28,6 +30,7 @@ public class NetworkManagerImpl implements NetworkManager {
 	String roomId;
 	String participantId;
 	private List<NetworkManager.Listener> listener;
+	private Queue<byte[]> receivedDataQueue;
 	
 	public NetworkManagerImpl(GamesClient client, String roomId, String participantId)
 	{
@@ -35,6 +38,7 @@ public class NetworkManagerImpl implements NetworkManager {
 		this.roomId = roomId;
 		this.participantId = participantId;
 		this.listener = new ArrayList<NetworkManager.Listener>();
+		this.receivedDataQueue = new ConcurrentLinkedQueue<byte[]>();
 	}
 	
 	/* (non-Javadoc)
@@ -85,22 +89,7 @@ public class NetworkManagerImpl implements NetworkManager {
 	@Override
 	public void onRealTimeMessageReceived(byte[] message) {
 		
-		Log.d("NETWORK_MANAGER", "Message received.");
-		Log.d("NETWORK_MANAGER", "byte length: " + message.length);
-		
-		try {
-			DataPackage pkg = DataPackage.fromByte(message);
-			//notify observers, that a new message has been received. 
-			for (NetworkManager.Listener listener : this.listener) {
-				listener.onPackageReceived(pkg);
-			}
-		}
-		
-		catch (Exception e) {
-			Gdx.app.error("NETWORK_MANAGER","Error while parsing package.");
-			Gdx.app.error("NETWORK_MANAGER", e.toString());
-		}
-		
+		this.receivedDataQueue.add(message);
 		
 	}
 	
@@ -115,6 +104,29 @@ public class NetworkManagerImpl implements NetworkManager {
 	@Override
 	public void sendPackage(byte[] message) {
 		client.sendReliableRealTimeMessage(null, message, roomId, participantId);
+	}
+
+	@Override
+	public void update() {
+		//notify listener
+		while (!this.receivedDataQueue.isEmpty()) {
+			
+			byte[] message = this.receivedDataQueue.poll();
+			
+			try {
+				DataPackage pkg = DataPackage.fromByte(message);
+				//notify observers, that a new message has been received. 
+				for (NetworkManager.Listener listener : this.listener) {
+					listener.onPackageReceived(pkg);
+				}
+			}
+			
+			catch (Exception e) {
+				Gdx.app.error("NETWORK_MANAGER","Error while parsing package.");
+				Gdx.app.error("NETWORK_MANAGER", e.toString());
+			}
+			
+		}
 	}
 
 	

@@ -33,7 +33,7 @@ public class RemoteForceManager implements ForceManager, NetworkManager.Listener
 			//the package contains a force vector
 			//get force vector and set the current force accordingly
 			currentForce = ByteConverter.toVector3(data.getPayload(), 0);
-			Gdx.app.log("RemoteForceManager", "Current received force: " + currentForce.toString());
+			//Gdx.app.log("RemoteForceManager", "Current received force: " + currentForce.toString());
 		}
 	}
 

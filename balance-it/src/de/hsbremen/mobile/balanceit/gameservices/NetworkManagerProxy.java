@@ -174,4 +174,10 @@ public class NetworkManagerProxy implements NetworkManager, NetworkManager.Liste
 		}
 	}
 
+	@Override
+	public void update() {
+		this.instance.update();
+		
+	}
+
 }

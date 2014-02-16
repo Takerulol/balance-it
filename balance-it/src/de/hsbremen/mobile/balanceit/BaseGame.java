@@ -127,6 +127,11 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 			this.currentView.create();
 			this.changeView = false;
 		}
+		
+		if (this.networkManager != null) {
+			this.networkManager.update();
+		}
+		
 		this.currentView.render();
 		this.roleChanger.update();
 	}

@@ -24,5 +24,7 @@ public interface NetworkManager {
 	 * Message received handler.
 	 */
 	public abstract void onRealTimeMessageReceived(byte[] message);
+	
+	public abstract void update();
 
 }
