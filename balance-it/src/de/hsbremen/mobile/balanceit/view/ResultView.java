@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -15,12 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.hsbremen.mobile.balanceit.gameservices.GameService;
 
-public class HelpView extends View {
-
+public class ResultView extends View {
+	
 	public static interface Listener {
-		void backFromHelp();
+		void backFromResult();
 	}
-
+	
 	private Listener listener;
 	
 	private Stage stage;
@@ -28,8 +28,13 @@ public class HelpView extends View {
 	private SpriteBatch batch;
 
 	private Sprite backgroundSprite;
-	
-	public HelpView(Listener listener, Skin skin) {
+
+	private float myTime;
+	private float enemyTime;
+	private boolean wasMultiplayer;
+
+
+	public ResultView(Listener listener, Skin skin) {
 		this.listener = listener;
 		setSkin(skin);
 	}
@@ -49,12 +54,12 @@ public class HelpView extends View {
 		backButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				listener.backFromHelp();				
+				listener.backFromResult();				
 			}
 		});
 		this.stage.addActor(backButton);
 		
-		Texture background = new Texture(Gdx.files.internal("images/textures/background_help.png"));
+		Texture background = new Texture(Gdx.files.internal("images/textures/background_result.png"));
 		background.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		backgroundSprite = new Sprite(background);
@@ -64,14 +69,6 @@ public class HelpView extends View {
 
 	@Override
 	public void resize(int width, int height) {
-//		Vector2 size = Scaling.fit.apply(800, 480, width, height);
-//        int viewportX = (int)(width - size.x) / 2;
-//        int viewportY = (int)(height - size.y) / 2;
-//        int viewportWidth = (int)size.x;
-//        int viewportHeight = (int)size.y;
-//        Gdx.gl.glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
-//        stage.setViewport(800, 480, true, viewportX, viewportY, viewportWidth, viewportHeight);
-//        this.menuTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
 	}
 
 	@Override
@@ -90,26 +87,50 @@ public class HelpView extends View {
 
 	@Override
 	public void setGameService(GameService gameService) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void renderObjects() {
 		batch.begin();
 		backgroundSprite.draw(batch);
-		float ratio = (float)Gdx.graphics.getWidth() / 800f;
-		font.setScale(ratio * 2f);
-		renderCenteredText("How to Play", -0.3f);
-		font.setScale(ratio);
-		renderCenteredText("1. Hold the phone flat", 0f);
-		renderCenteredText("2. Start the Game", 0.05f);
-		renderCenteredText("3. Balance the Ball on the Plate!", 0.1f);
-		font.setScale(1f);
+		drawEndingText();
 		batch.end();
 		
 		this.stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 		this.stage.draw();
+	}
+
+	private void drawEndingText() {
+		float ratio = (float)Gdx.graphics.getWidth() / 800f;
+		float rMyTime = Math.round(myTime * 100f) / 100f;
+		float rEnemyTime = Math.round(enemyTime * 100f) / 100f;
+		
+		if(wasMultiplayer) { //multiplayer
+			font.setScale(ratio*3f);
+			if(myTime > enemyTime) { //win
+				renderCenteredText("You won!", -0.2f);
+			} else { //lose
+				renderCenteredText("You lost!", -0.2f);
+			}
+			font.setScale(ratio);
+			renderCenteredText("You achieved "+rMyTime+" seconds.", 0.0f);
+			renderCenteredText("Your enemy achieved "+rEnemyTime+" seconds.", 0.1f);
+		} else { //singleplayer
+			font.setScale(ratio*1.5f);
+			renderCenteredText("You achieved "+ rMyTime +" seconds of balancing! Great!");
+		}
+		font.setScale(1f);
+	}
+
+	public void showSingleplayerEnd(float myTime) {
+		this.myTime = myTime;
+		this.wasMultiplayer = false;
+	}
+
+	public void showMultiplayerEnd(float myTime, float enemyTime) {
+		this.myTime = myTime;
+		this.enemyTime = enemyTime;
+		this.wasMultiplayer = true;
 	}
 	
 	private void renderCenteredText(String text) {

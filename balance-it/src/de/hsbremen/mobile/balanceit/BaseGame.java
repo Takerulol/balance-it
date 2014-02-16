@@ -47,14 +47,17 @@ import de.hsbremen.mobile.balanceit.view.GetReadyView;
 import de.hsbremen.mobile.balanceit.view.GetReadyView.GetReadyViewListener;
 import de.hsbremen.mobile.balanceit.view.HelpView;
 import de.hsbremen.mobile.balanceit.view.MenuView;
+import de.hsbremen.mobile.balanceit.view.ResultView;
 import de.hsbremen.mobile.balanceit.view.View;
 
 public class BaseGame implements ApplicationListener, GameView.Listener, MenuView.Listener, 
-GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listener {
+	GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listener,
+	ResultView.Listener {
 	
 	MenuView menuView;
 	GameView gameView;
 	HelpView helpView;
+	ResultView resultView;
 	
 	View currentView;
 	View nextView;
@@ -98,6 +101,7 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 		this.menuView = new MenuView(this, this.skin);
 		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer, skin);
 		this.helpView = new HelpView(this, this.skin);
+		this.resultView = new ResultView(this, this.skin);
 
 		this.roleChanger = new RoleChanger(role, this.gameView, this, this.networkManager, this.timer);
         
@@ -196,7 +200,7 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 	}
 
 	@Override
-	public void switchBack() {
+	public void backFromHelp() {
 		switchToMenu();
 	}
 
@@ -216,7 +220,9 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 	public void onEndGame(float myTime) {
 		Gdx.app.log("BaseGame", "Ending game with time " + myTime);
 		this.roleChanger.reset();
-		this.changeView(this.menuView);
+		
+		this.resultView.showSingleplayerEnd(myTime);
+		this.changeView(this.resultView);
 	}
 
 	@Override
@@ -225,6 +231,12 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 		Gdx.app.log("BaseGame", "MyTime: " + myTime);
 		Gdx.app.log("BaseGame", "EnemyTime: " + enemyTime);
 		this.gameService.disconnectMultiplayer();
-		this.changeView(this.menuView);
+		this.resultView.showMultiplayerEnd(myTime,enemyTime);
+		this.changeView(this.resultView);
+	}
+
+	@Override
+	public void backFromResult() {
+		switchToMenu();
 	}
 }

@@ -8,11 +8,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Scaling;
 
@@ -138,8 +135,8 @@ public class GetReadyView extends View implements NetworkManager.Listener {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-
+		stage.dispose();
+		batch.dispose();
 	}
 
 	@Override
@@ -179,14 +176,6 @@ public class GetReadyView extends View implements NetworkManager.Listener {
 		batch.end();
 		
 		this.stage.draw();
-		
-//		batch.begin();
-//		font.setScale((float)Gdx.graphics.getWidth() / 800f * 2f);
-//		font.draw(batch, "Wurst", Gdx.graphics.getWidth() / 800 * 100, Gdx.graphics.getHeight() / 480 * 100);
-//		font.setScale(2f);
-//		font.draw(batch, "Wurst", Gdx.graphics.getWidth() / 800 * 150, Gdx.graphics.getHeight() / 480 * 150);
-//		font.setScale(1f);
-//		batch.end();
 		
 	}
 	

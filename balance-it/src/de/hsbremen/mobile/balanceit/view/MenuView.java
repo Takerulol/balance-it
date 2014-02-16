@@ -34,7 +34,6 @@ public class MenuView extends View implements GameServiceClient {
 
 	private Table menuTable;
 	
-	private boolean tempLoggedInState = false;
 	private Table gameServiceMenu = null;
 	private Table loggedInMenu;
 	private Table loggedOutMenu;
@@ -111,8 +110,6 @@ public class MenuView extends View implements GameServiceClient {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
-		
 	}
 	
 
@@ -130,27 +127,21 @@ public class MenuView extends View implements GameServiceClient {
 	private void checkMenuStatus() {
 		if(this.gameService != null) {
 			if(this.gameService.isLoggedIn()) {
-//				if(this.tempLoggedInState == false) {
-					switchLoggedInMenuState(true);
-//				}
+				switchLoggedInMenuState(true);
 			} else {
-//				if(this.tempLoggedInState == true) {
-					switchLoggedInMenuState(false);
-//				}
+				switchLoggedInMenuState(false);
 			}
 		}
 	} 
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-		
+		stage.dispose();
+		batch.dispose();
 	}
 
 	@Override
