@@ -1,5 +1,7 @@
 package de.hsbremen.mobile.balanceit.gameservices;
 
+import java.nio.ByteBuffer;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
@@ -9,7 +11,7 @@ import de.hsbremen.mobile.balanceit.view.GameView;
 
 /**
  * This class monitors the current gamestate and changes the player role if necessary (event is fired for that).
- * Depending on the player role, the behaviour of the class changes.
+ * Depending on the player role, the behavior of the class changes.
  * SINGLE_PLAYER: The class monitors the sphere position and restarts the game as a single player.
  * BALANCER: The class monitors the sphere position. If the sphere has fallen down, a package is send over the network
  * 			to inform the other player and an event is fired to assume the other player role.
@@ -23,11 +25,17 @@ public class RoleChanger implements NetworkManager.Listener {
 	private NetworkManager manager;
 	private static final String TAG = "RoleChanger";
 	
+	//Variables for winner detection
+	private Timer timer;
+	private float enemyTime = 0.0f;
+	private float myTime = 0.0f;
+	
 	public RoleChanger(PlayerRole currentRole, GameView gameView,
-			RoleChangerListener listener, NetworkManager manager) {
+			RoleChangerListener listener, NetworkManager manager, Timer timer) {
 		this.currentRole = currentRole;
 		this.gameView = gameView;
 		this.listener = listener;
+		this.timer = timer;
 		setManager(manager);
 	}
 
@@ -35,7 +43,8 @@ public class RoleChanger implements NetworkManager.Listener {
 
 	public interface RoleChangerListener {
 		void onChangeRole(PlayerRole role);
-		void onEndGame();
+		void onEndGame(float myTime);
+		void onEndGame(float myTime, float enemyTime);
 	}
 	
 	private boolean isSphereOut(ModelInstance sphere) {
@@ -57,23 +66,31 @@ public class RoleChanger implements NetworkManager.Listener {
 		//force applier will be updated via network packages
 			if (isSphereOut(this.gameView.getSphere())) {
 				
-				switch (this.currentRole) {
-				case SinglePlayer:
-					Gdx.app.log(TAG, "Changing role to SinglePlayer");
-					this.listener.onChangeRole(PlayerRole.SinglePlayer);
-					break;
+				myTime = timer.getLocalTime();
 				
-				case Balancer:
-				//send a package to the other player to change the role then change role
-					Gdx.app.log(TAG, "Changing role to ForceApplier. Sending Package.");
-					byte[] payload = { PlayerRole.Balancer.getByteValue() };
-					this.manager.sendPackage(Header.CHANGE_ROLE, payload);
-					this.listener.onChangeRole(PlayerRole.ForceApplier);
-					break;
+				if (myTime != 0.0f) {
+				
+					switch (this.currentRole) {
+					case SinglePlayer:
+						Gdx.app.log(TAG, "Changing role to SinglePlayer");
+						changeRole(PlayerRole.SinglePlayer);
+						break;
 					
-				case ForceApplier:
-					//do nothing
-					break;
+					case Balancer:
+					//send a package to the other player to change the role then change role
+						Gdx.app.log(TAG, "Changing role to ForceApplier. Sending Package.");
+						ByteBuffer payload = ByteBuffer.allocate(5); //PlayerRole + Time
+						payload.put(PlayerRole.Balancer.getByteValue());
+						payload.putFloat(myTime);
+						//byte[] payload = { PlayerRole.Balancer.getByteValue() };
+						this.manager.sendPackage(Header.CHANGE_ROLE, payload.array());
+						changeRole(PlayerRole.ForceApplier);
+						break;
+						
+					case ForceApplier:
+						//do nothing
+						break;
+					}
 				}
 				
 			}
@@ -127,13 +144,42 @@ public class RoleChanger implements NetworkManager.Listener {
 			
 			Gdx.app.log(TAG, "Changing role according to Package.");
 			
-			PlayerRole role = PlayerRole.fromValue(data.getPayload()[0]);
+			ByteBuffer payload = ByteBuffer.wrap(data.getPayload());
+			PlayerRole role = PlayerRole.fromValue(payload.get());
+			enemyTime = payload.getFloat();
 			
-			Gdx.app.log(TAG, "Package role: " + role.toString());
 			
-			this.listener.onChangeRole(role);
+			Gdx.app.log(TAG, "Package role: " + role.toString() + " EnemyTime: " + enemyTime);
+			
+			changeRole(role);
 		}
+	}
+	
+	/**
+	 * Notifies all listeners to change the role, or notifies them to show the result screen, if
+	 * the game is over.
+	 */
+	private void changeRole(PlayerRole role) {
 		
+		if (myTime != 0.0f && role.equals(PlayerRole.SinglePlayer)) {
+			//end the game single player
+			this.listener.onEndGame(myTime);
+		}
+		else if (myTime != 0.0f && enemyTime != 0.0f) {
+			//end game multiplayer
+			this.listener.onEndGame(myTime, enemyTime);
+		}
+		else {
+			//change the role multiplayer
+			if (!role.equals(PlayerRole.SinglePlayer))
+				this.listener.onChangeRole(role);
+		}
+	
+	}
+	
+	public void reset() {
+		enemyTime = 0.0f;
+		myTime = 0.0f;
 	}
 	
 }

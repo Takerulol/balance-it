@@ -99,7 +99,7 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 		this.gameView = new GameViewFactory().createGameView(this, role, INCREASE_DIFFICULTY, networkManager, timer, skin);
 		this.helpView = new HelpView(this, this.skin);
 
-		this.roleChanger = new RoleChanger(role, this.gameView, this, this.networkManager);
+		this.roleChanger = new RoleChanger(role, this.gameView, this, this.networkManager, this.timer);
         
         if(this.gameService != null) {
         	this.menuView.setGameService(this.gameService);
@@ -176,6 +176,7 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 	public void startMultiplayerGame(PlayerRole role, NetworkManager manager) {
 		Gdx.app.log("BaseGame", "Starting multiplayer game as role " + role);
 		setNetworkManager(manager);
+		this.roleChanger.reset();
 		this.startGame(role);
 	}
 	
@@ -187,12 +188,6 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 	@Override
 	public void onChangeRole(PlayerRole role) {
 		startGame(role);
-	}
-
-	@Override
-	public void onEndGame() {
-		// TODO Implement score screen
-		
 	}
 
 	@Override
@@ -215,5 +210,20 @@ GameService.Listener, RoleChangerListener, GetReadyViewListener, HelpView.Listen
 		this.changeView(this.menuView);
 		this.menuView.showDisconnectedDialog();
 
+	}
+
+	@Override
+	public void onEndGame(float myTime) {
+		Gdx.app.log("BaseGame", "Ending game with time " + myTime);
+		this.roleChanger.reset();
+		this.changeView(this.menuView);
+	}
+
+	@Override
+	public void onEndGame(float myTime, float enemyTime) {
+		Gdx.app.log("BaseGame", "Ending game.");
+		Gdx.app.log("BaseGame", "MyTime: " + myTime);
+		Gdx.app.log("BaseGame", "EnemyTime: " + enemyTime);
+		this.changeView(this.menuView);
 	}
 }

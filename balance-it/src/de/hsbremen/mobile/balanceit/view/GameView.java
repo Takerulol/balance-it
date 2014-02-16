@@ -247,7 +247,7 @@ public class GameView extends View {
 		float ratio = (float)Gdx.graphics.getWidth() / 800f;
 		font.setScale(ratio * 1f);
 		//TODO: enter time
-		renderCenteredText("Time :     "+ Math.round(timer.getRenderTime() * 100f) / 100f , -0.45f, font.getBounds("Time :     0.00"));
+		renderCenteredText("Time :     "+ Math.round(timer.getLocalTime() * 100f) / 100f , -0.45f, font.getBounds("Time :     0.00"));
 		font.setScale(1f);
 		interfaceBatch.end();
 	}
