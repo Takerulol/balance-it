@@ -102,9 +102,12 @@ public class HelpView extends View {
 		font.setScale(ratio * 2f);
 		renderCenteredText("How to Play", -0.3f);
 		font.setScale(ratio);
-		renderCenteredText("1. Hold the phone flat", 0f);
-		renderCenteredText("2. Start the Game", 0.05f);
-		renderCenteredText("3. Balance the Ball on the Plate!", 0.1f);
+		renderCenteredText("1. Hold the phone flat", -0.1f);
+		renderCenteredText("2. Start the Game", -0.05f);
+		renderCenteredText("3. Balance the Ball on the Plate!", 0.0f);
+		
+		renderCenteredText("If you play against a friend and you have to apply force:", 0.1f);
+		renderCenteredText("MOVE YOUR FINGER AROUND!", 0.15f);
 		font.setScale(1f);
 		batch.end();
 		

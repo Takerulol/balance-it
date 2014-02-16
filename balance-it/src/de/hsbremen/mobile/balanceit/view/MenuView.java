@@ -76,16 +76,16 @@ public class MenuView extends View implements GameServiceClient {
 		this.menuTable = new Table(getSkin());
 		this.menuTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
 		 
-		if(this.gameService != null) {
-			initializeGameServiceMenu();
-		}
-
 		//Add buttons
 		this.menuTable.add(startGameButton);
 		this.menuTable.row();
 		this.menuTable.add(helpButton);
 		this.menuTable.row();
 		
+		if(this.gameService != null) {
+			initializeGameServiceMenu();
+		}
+
 		this.stage.addActor(this.menuTable);
 		
 		Texture logo = new Texture(Gdx.files.internal("images/textures/logo.png"));
