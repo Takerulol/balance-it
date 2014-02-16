@@ -52,6 +52,9 @@ public class HelpView extends View {
 				listener.backFromHelp();				
 			}
 		});
+		backButton.setTransform(true);
+		backButton.scale(.3f);
+		
 		this.stage.addActor(backButton);
 		
 		Texture background = new Texture(Gdx.files.internal("images/textures/background_help.png"));

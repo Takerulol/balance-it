@@ -65,6 +65,8 @@ public class GetReadyView extends View implements NetworkManager.Listener {
 		
 		this.outputTable = new Table(getSkin());
 		this.outputTable.setPosition(stage.getWidth() / 2f, stage.getHeight() / 2f);
+		this.outputTable.setTransform(true);
+		this.outputTable.scale(.3f);
 		
 		batch = new SpriteBatch();
 		font = getSkin().getFont("default-font");
