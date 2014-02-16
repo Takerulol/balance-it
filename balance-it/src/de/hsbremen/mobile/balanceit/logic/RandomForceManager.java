@@ -22,9 +22,11 @@ public class RandomForceManager implements ForceManager {
 	private Vector3 forceVector;
 	
 	private Random random;
+	private Random directionRandom;
 	
 	public RandomForceManager() {
 		random = new Random();
+		directionRandom = new Random();
 		forceVector = Vector3.Zero;
 		//forceVector = getRandomForceVector();
 	}
@@ -47,10 +49,19 @@ public class RandomForceManager implements ForceManager {
 	 */
 	private Vector3 getRandomForceVector() {
 		//get a random direction
-		float x = random.nextFloat();
-		float z = random.nextFloat();
+		float x = randomizeDirection(random.nextFloat());
+		float z = randomizeDirection(random.nextFloat());
+		
 		Vector3 force = new Vector3(x, 0, z).nor().scl(FORCE_MAGNITUTE);
 		return force;
+	}
+	
+	private float randomizeDirection(float value) {
+		if (directionRandom.nextBoolean()) {
+			value = value * -1;
+		}
+		
+		return value;
 	}
 	
 	
