@@ -28,6 +28,10 @@ public class Interpolation {
 	private float timestampA = 0.0f;
 	private float timestampB = 0.0f;
 	
+	//values for debugging
+	private int misses = 0;
+	private int calls = 0;
+	
 	public Interpolation(Timer timer) {
 		this.timer = timer;
 		this.transformationList = new TreeMap<Float, Matrix4>();
@@ -46,6 +50,7 @@ public class Interpolation {
 		Matrix4 result = null;
 		renderTime = timer.getRenderTime();
 		//log();
+		calls++;
 		
 		//update matrices if required
 		if (matrixA == null) {
@@ -63,7 +68,7 @@ public class Interpolation {
 				result = interpolateMatrix4(matrixA, timestampA, matrixB, timestampB);
 			} else {
 				result = matrixA;
-				Gdx.app.log(tag, "No matrixB found (RenderTime: " + renderTime);
+				misses++;
 			}
 		}	
 		
@@ -119,11 +124,17 @@ public class Interpolation {
 	private synchronized void log(float alpha) {
 		
 		if (logTimer < timer.getLocalTime()) {
+			
+			float missPercentage = (float) misses / (float) calls * 100.0f;
+			misses = 0;
+			calls = 0;
+			
 			Gdx.app.log(tag, "----------------------------------------");
 			Gdx.app.log(tag, "Render Time: " + renderTime);
 			Gdx.app.log(tag, "Timestamp A: " + timestampA);
 			Gdx.app.log(tag, "Timestamp B: " + timestampB);
 			Gdx.app.log(tag, "Alpha: " + alpha);
+			Gdx.app.log(tag, "Misses: " + missPercentage + "%");
 			
 			int i = 0;
 			for (Float timestamp : this.transformationList.keySet()) {

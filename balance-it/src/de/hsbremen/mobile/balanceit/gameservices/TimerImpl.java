@@ -9,7 +9,7 @@ public class TimerImpl implements Timer {
 	/**
 	 * The amount of update intervals the client render time is shifted back for interpolation.
 	 */
-	public static final float CLIENT_RENDER_DELAY = 2.5f;
+	public static final float CLIENT_RENDER_DELAY = 3.0f;
 	
 	/**
 	 * The current time of the local machine.
@@ -26,7 +26,7 @@ public class TimerImpl implements Timer {
 	 * Time in seconds in which the offset will be set to the currentOffset.
 	 * This is to prevent the render time to change every time a package is received. 
 	 */
-	private static final float OFFSET_UPDATE_INTERVAL = 2.0f;
+	private static final float OFFSET_UPDATE_INTERVAL = 0.0f;
 	
 	/**
 	 * Percentage of the newly calculated offset that will be taken into account for the new offset.
